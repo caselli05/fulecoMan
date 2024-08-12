@@ -66,44 +66,86 @@ clickDown:
 	bne t2, t1, goLeft
 	li s0, 4
 
-	mv a0, s8
 goLeft:
+	mv a0, s8
+
 	li t1, 1
 	bne s0, t1, goRight
-	addi a1, a1, -4
-	call checkCollision
-	li t0, 1
-	beq t1, t0, pass
-	addi a1, a1, 4
+	addi a1, a1, -4			# update temporario da posicao para 4 pixels para esquerda
+	call checkCollision		# check da colisao superior esquerda
+	li t0, 0			# t0 = 0
+	addi a1, a1, 4			# cancela o update temporario do eixo X
+	beq t1, t0, pass		# se ha colisao, pula para "pass"
+	
+	addi a1, a1, -4			# update da posicao para 4 pixels para esquerda
+	addi a2, a2, 15			# update da posicao para 15 pixels para baixo
+	call checkCollision		# check da colisao inferior esquerda
+	li t0, 0			# t0 = 0
+	addi a1, a1, 4			# cancela o update temporario do eixo X
+	addi a2, a2, -15		# cancela o update temporario do eixo Y
+	beq t1, t0, pass		# se ha colisao, pula para "pass"
+	
+	addi a1, a1, -4			# update da posicao para 4 pixels para a esquerda
+	
 goRight:
 	li t1, 2
 	bne s0, t1, goUp
-	addi a1, a1, 4
-	call checkCollision
-	li t0, 1
-	beq t1, t0, pass
-	addi a1, a1, -4
+	addi a1, a1, 16			# update temporario do eixo X para a direita 
+	call checkCollision		# check de colisao superior direita
+	addi a1, a1, -16		# cancela o update temporario do eixo X para a direita
+	li t0, 0			# t0 = 0
+	beq t1, t0, pass		# se ha colisao, pula para "pass"
+	
+	addi a1, a1, 16			# update temporario do eixo X para a diereita
+	addi a2, a2, 15			# update temporario do eixo Y para baixo
+	call checkCollision		# check de colisao inferior direita
+	addi a1, a1, -16		# cancela o update temporario do eixo X para a direita
+	addi a2, a2, -15		# cancela o update temporario do eixo Y para a esquerda
+	li t0, 0			# t0 = 0
+	beq t1, t0, pass		# se ha colisao, pula para "pass"
+	
+	addi a1, a1, 4			# update da posicao para 4 pixels para a direita	
 goUp:	
 	li t1, 3
 	bne s0, t1, goDown
-	addi a2, a2, -4
-	call checkCollision
-	li t0, 1
-	beq t1, t0, pass
-	addi a2, a2, 4
+	addi a2, a2, -4			# update temporario do eixo Y para cima
+	call checkCollision		# check de colisao superior equerda
+	addi a2, a2, 4			# cancela o update temporario do eixo Y
+	li t0, 0			# t0 = 0
+	beq t1, t0, pass		# se ha colisao, pula para "pass"
+	
+	addi a2, a2, -4			# update temporario do eixo Y para cima
+	addi a1, a1, 12			# update temporario do eixo X para direita
+	call checkCollision		# check de colisao superior direito
+	addi a2, a2, 4			# cancela update temporario do eixo Y para cima
+	addi a1, a1, -12		# cancela update temporario do eixo X para direita
+	li t0, 0			# t0 = 0
+	beq t0, t1, pass		# se ha colisao, pula para "pass"
+	
+	addi a2, a2, -4			# update da posicao para 4 pixels para a cima
 goDown:
 	li t1, 4
 	bne s0, t1, pass
-	addi a2, a2, 4
-	call checkCollision
-	li t0, 1
-	beq t1, t0, pass
-	addi a2, a2, -4		
+	addi a2, a2, 16			# update temporario do eixo Y para baixo
+	call checkCollision		# check de colisao inferior equerda
+	addi a2, a2, -16			# cancela o update temporario do eixo Y
+	li t0, 0			# t0 = 0
+	beq t1, t0, pass		# se ha colisao, pula para "pass"
+	
+	addi a2, a2, 16			# update temporario do eixo Y para baixo
+	addi a1, a1, 12			# update temporario do eixo X para direita
+	call checkCollision		# check de colisao superior direito
+	addi a2, a2, -16		# cancela o update temporario do eixo Y 
+	addi a1, a1, -12		# cancela o update temporario do eixo X
+	li t0, 0			# t0 = 0
+	beq t0, t1, pass		# se ha colisao, pula para "pass"
+	
+	addi a2, a2, 4			# update da posicao para 4 pixels para a cima
 pass:	
 	li t1, 0
 	bne a1, t1, dontTeleportLeft
 	li t1, 64
-	#bne a2, t1, dontTeleportLeft
+	bne a2, t1, dontTeleportLeft
 	li t1, 2
 	beq s0, t1, dontTeleportLeft
 	li a1, 288
@@ -111,7 +153,7 @@ dontTeleportLeft:
 	li t1, 300
 	bne a1, t1, dontTeleportRight
 	li t1, 64
-	#bne a2, t1, dontTeleportLeft
+	bne a2, t1, dontTeleportLeft
 	li t1, 1
 	beq s0, t1, dontTeleportRight
 	li a1, 0
@@ -148,5 +190,3 @@ dontTeleportRight:
 .include "src/print.s"
 .include "src/checkCollision.s"
 	
-
-
