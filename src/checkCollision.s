@@ -13,13 +13,9 @@ checkCollision:
 	mul t1, a2, t1
 	add t0, t0, t1
 	
-	add a0, a0, t0
-	lw t1, 0(a0)
-	srli t1, t1, 4
-	
-	li a7,1
-	mv a0, t1
-	ecall
+	add t3, a0, t0
+	lw t1, 8(t3)
+	srli t1, t1, 24
 	
 	li t0, 255
 	beq t1, t0, block
