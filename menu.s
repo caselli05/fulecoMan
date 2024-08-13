@@ -24,7 +24,10 @@ NUM2: .word 20
 NOTAS: 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 55, 200, 53, 200, 52, 200, 50, 200, 48, 200, 50, 200, 52, 200, 55, 200, 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 62, 200, 59, 200, 57, 200, 55, 200, 60, 200, 55, 200, 59, 200, 55, 200, 64, 200, 52, 200, 50, 200, 60, 200, 48, 200, 47, 200, 60, 200, 50, 200, 65, 200, 53, 200, 52, 200, 60, 200, 50, 200, 48, 200, 60, 200, 52, 200, 67, 200, 55, 200, 52, 200, 65, 200, 50, 200, 48, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 55, 200, 60, 200, 55, 200, 59, 200, 55, 200, 64, 200, 52, 200, 50, 200, 60, 200, 48, 200, 47, 200, 60, 200, 50, 200, 65, 200, 53, 200, 52, 200, 60, 200, 50, 200, 48, 200, 60, 200, 52, 200, 67, 200, 55, 200, 52, 200, 65, 200, 50, 200, 48, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 64, 200, 62, 200, 55, 200, 60, 200, 59, 200, 64, 200, 52, 200, 50, 200, 52, 200, 55, 200, 52, 200, 72, 200, 55, 200, 69, 200, 57, 200, 55, 200, 69, 200, 69, 200, 67, 200, 64, 200, 62, 200, 64, 200, 52, 200, 60, 200, 48, 200, 62, 200, 50, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 55, 200, 53, 200, 52, 200, 50, 200, 48, 200, 64, 200, 52, 200, 50, 200, 52, 200, 55, 200, 52, 200, 72, 200, 55, 200, 69, 200, 57, 200, 55, 200, 69, 200, 69, 200, 67, 200, 64, 200, 62, 200, 64, 200, 52, 200, 60, 200, 48, 200, 62, 200, 50, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 64, 200, 62, 200, 50, 200, 60, 200, 59, 200 
 NOTAS2: 36, 1600, 41, 1600, 33, 1600, 43, 1600, 36, 1600, 38, 1600, 40, 1600, 43, 1600, 36, 1600, 38, 1600, 40, 1600, 43, 1600, 36, 1600, 41, 1600, 33, 1600, 43, 1600, 36, 1600, 41, 1600, 33, 1600, 43, 1600 
 
-.include "sprites/Menu/arquivos .data/menu.data"		# inclui o .data com a imagem
+.include "sprites/Menu/arquivos .data/menu.data"			# inclui o .data com a menu
+.include "sprites/Mapas/arquivos .data/map1.data"			# inclui o .data com o mapa 1
+.include "sprites/fuleco/arquivos .data/fixedFuleco0.data"		# inclui o .data com o Fuleco 1
+.include "sprites/Mapas/arquivos .data/collisionmap1.data"		# inclui o .data com as colisoes mapa 
 
 
 .text
@@ -81,8 +84,8 @@ LOOP2:	li t1,0xFF200000	# carrega o endereco de controle do KDMMIO
    	beq t0,zero,MUSIC   	# Se nao ha tecla pressionada entao vai para MUSIC
   	lw t2,4(t1)  		# le o valor da tecla tecla
 	sw t2,12(t1)  		# escreve a tecla pressionada no display
-	beq t2, t3, FIM		# vai pro mapa 1
-	beq t2, t4, FIM		# "hack" pro mapa 2
+	beq t2, t3, gameOneStart# vai pro mapa 1
+	beq t2, t4, end		# "hack" pro mapa 2
 	
     #toca a musica
 MUSIC:	beq t5, s3, FORA
@@ -103,14 +106,6 @@ MUSIC2:	lw a0, 0(a5)
 	
 	j LOOP2
 	
-FIM:	li s0,0xFF200604	# Escolhe o Frame 0 ou 1
-	li t2,0			# inicio Frame 0
-	xori t2,t2,0x001	# escolhe a outra frame
-	sw t2,0(s0)		# seleciona a Frame t2
-	
-	li a7, 10
-	ecall
-	
 DOIS:	lw a0, 0(a6)
 	lw a1, 4(a6)
 	li a7, 31
@@ -120,6 +115,21 @@ DOIS:	lw a0, 0(a6)
 	addi a6, a6, 8
 	addi t5, t5, 1
 	j MUSIC2
+	
+	
+gameOneStart:
+	la s8, collisionmap1
+	la s9, map1
+	la s10, fixedFuleco0
+	call gameStart
+
+
+end:
+	li a7, 10
+	ecall
+
+.include "teste.asm"
+
 	
 	
 	
