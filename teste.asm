@@ -1,4 +1,4 @@
-gameStart:
+main:
     # print map in frame 0
     	mv a0, s9
 	li a1, 0
@@ -20,8 +20,7 @@ gameStart:
 	
 	
 	li s0, 0			# s0 = runing state : 0 = stop // 1 = left // 2 = right // 3 = up // 4 = down
-	li s7, 0
-	li t6, 0
+	
 loopgame:
 	xori a3, a3, 1			# change frame 0 <--> 1
     # print map1
@@ -33,20 +32,13 @@ loopgame:
 	mv a1, s3
 	mv a2, s4
 	
-	li t6, 0
-getInput:	
-	li a0, 1
-	li a7, 32
-	ecall
-	
 	li t2, 0
 	li t1,0xFF200000		# load KDMMIO andress
 	lw t0,0(t1)			# Le bit de Controle Teclado
 	andi t0,t0,0x0001		# mascara o bit menos significativo
-	beq t0,zero, clickLeft  	# Se nao ha tecla pressionada entao vai clickLeft
+	beq t0,zero, goLeft  		# Se nao ha tecla pressionada entao vai clickLeft
 	lw t2,4(t1)  			# le o valor da tecla tecla
-	sw t2,12(t1)  			# escreve a tecla pressionada no display
-	j clickLeft	
+	sw t2,12(t1)  			# escreve a tecla pressionada no display	
 		
 clickLeft:
 	mv a0, s8
@@ -231,13 +223,6 @@ dontTeleportRight:
 	li a7, 10
 	#ecall
 	ret
-	
-	
-	
-	#	a0 = endereço imagem			#
-	#	a1 = x					#
-	#	a2 = y					#
-	#	a3 = frame (0 ou 1)
 	
 .include "src/print.s"
 .include "src/checkCollision.s"
