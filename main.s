@@ -1,7 +1,7 @@
 .data
-.include "sprites/Mapas/arquivos .data/map1.data"		# inclui o .data com a imagem
+.include "sprites/Mapas/arquivos .data/map1.data"			# inclui o .data com a imagem
 .include "sprites/fuleco/arquivos .data/fixedFuleco0.data"		# inclui o .data com a imagem
-.include "sprites/Mapas/arquivos .data/collisionmap1.data"
+.include "sprites/Mapas/arquivos .data/testeCollision.data"
 
 
 
