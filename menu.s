@@ -27,7 +27,7 @@ NOTAS2: 36, 1600, 41, 1600, 33, 1600, 43, 1600, 36, 1600, 38, 1600, 40, 1600, 43
 .include "sprites/Menu/arquivos .data/menu.data"			# inclui o .data com a menu
 .include "sprites/Mapas/arquivos .data/map1.data"			# inclui o .data com o mapa 1
 .include "sprites/fuleco/arquivos .data/fixedFuleco0.data"		# inclui o .data com o Fuleco 1
-.include "sprites/Mapas/arquivos .data/collisionmap1.data"		# inclui o .data com as colisoes mapa 
+.include "sprites/Mapas/arquivos .data/testeCollision.data"		# inclui o .data com as colisoes mapa 
 
 
 .text
@@ -118,17 +118,18 @@ DOIS:	lw a0, 0(a6)
 	
 	
 gameOneStart:
-	la s8, collisionmap1
+	la s8, testeCollision
 	la s9, map1
 	la s10, fixedFuleco0
-	call gameStart
+	jal a6, main
 
 
 end:
 	li a7, 10
 	ecall
 
-.include "teste.asm"
+.include "main.s"
+#.include "teste.asm"
 
 	
 	
