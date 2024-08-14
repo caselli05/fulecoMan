@@ -1,6 +1,6 @@
 ###############
-# s0 = Frame 0
-# s1 = Frame 1
+# s0 = 
+# s1 = 
 # s2 = endereco das notas
 # s3 = numero de notas
 # s4 = endereco das notas2
@@ -31,6 +31,16 @@ NOTAS2: 36, 1600, 41, 1600, 33, 1600, 43, 1600, 36, 1600, 38, 1600, 40, 1600, 43
 
 
 .text
+    # Setup tela 
+	la a0, menu
+	li a1, 0
+	li a2, 0
+	li a3, 0
+	call print
+	
+	li a3, 1
+	call print
+	
     # Setup musica
 	la s2, NUM		# define o endereco do numero de notas
 	lw s3, 0(s2)		# numero de notas
@@ -45,28 +55,9 @@ NOTAS2: 36, 1600, 41, 1600, 33, 1600, 43, 1600, 36, 1600, 38, 1600, 40, 1600, 43
 	li a3, 127		# define o volume para notas
 	li s6, 16		# contador de 16 para notas 2
 	
-    # Setup tela 
-	li s0,0xFF000000	# Frame0
-	li s1,0xFF100000	# Frame1
-	la t0,menu		# endere�o da imagem
-	lw t1,0(t0)		# n�mero de linhas
-	lw t2,4(t0)		# n�mero de colunas
-	li t3,0			# contador
-	mul t4,t1,t2		# numero total de pixels
-	addi t0,t0,8		# primeiro pixel da imagem
-LOOP: 	beq t3,t4,FORA		# Coloca a imagem no Frame0
-	lw t5,0(t0)
-	sw t5,0(s0)
-	not t5, t5
-	sw t5,0(s1)	
-	addi t0,t0,4
-	addi s0,s0,4
-	addi s1,s1,4
-	addi t3,t3,1
-	j LOOP	
 	
-FORA:	li s0,0xFF200604	# Escolhe o Frame 0 ou 1
-	li t2,0			# inicio Frame 0
+FORA:	#li s0,0xFF200604	# Escolhe o Frame 0 ou 1
+	#li t2,0			# inicio Frame 0
 
 	sw t2,0(s0)		# seleciona a Frame t2
 	li t3, 49		# t3 = '1'
