@@ -1,4 +1,5 @@
 main:
+	mv a6, ra
     # print map in frame 0
     	mv a0, s9
 	li a1, 0
@@ -20,15 +21,23 @@ main:
 	
 	
 	li s0, 0			# s0 = runing state : 0 = stop // 1 = left // 2 = right // 3 = up // 4 = down
+	li s1, 0
 	
 loopgame:
 	xori a3, a3, 1			# change frame 0 <--> 1
-    # print map1
+    # print map
     	mv a0, s9
     	li a1, 0
     	li a2, 0
     	call print
-	
+    	
+    # print props
+    	mv a0, s8
+    	li a1, 0
+    	li a2, 0
+    	call printProps 
+
+input:
 	mv a1, s3
 	mv a2, s4
 	
@@ -38,7 +47,7 @@ loopgame:
 	andi t0,t0,0x0001		# mascara o bit menos significativo
 	beq t0,zero, goLeft  		# Se nao ha tecla pressionada entao vai clickLeft
 	lw t2,4(t1)  			# le o valor da tecla tecla
-	sw t2,12(t1)  			# escreve a tecla pressionada no display	
+	sw t2,12(t1)  			# escreve a tecla pressionada no display    		
 		
 clickLeft:
 	mv a0, s8
@@ -192,36 +201,70 @@ goDown:
 	
 	addi a2, a2, 4			# update da posicao para 4 pixels para a cima
 pass:	
-	li t1, 0
-	bne a1, t1, dontTeleportLeft
-	li t1, 64
-	bne a2, t1, dontTeleportLeft
-	li t1, 2
-	beq s0, t1, dontTeleportLeft
-	li a1, 288
-dontTeleportLeft:
-	li t1, 300
-	bne a1, t1, dontTeleportRight
-	li t1, 64
-	bne a2, t1, dontTeleportLeft
-	li t1, 1
-	beq s0, t1, dontTeleportRight
-	li a1, 0
+	li t1, 0			# t1 = 0
+	bne a1, t1, dontTeleportLeft	# se posX != 0, pula pra "dontTeleportLeft"
+	li t1, 64			# t1 = 64
+	bne a2, t1, dontTeleportLeft	# se posY != 64, pula pra "dontTeleportLeft"
+	li t1, 2			# t1 = 2
+	beq s0, t1, dontTeleportLeft	# se movState == right, pula pra "dontTeleportLeft" 
+	li a1, 288			# usa o teleporte da esquerda
+dontTeleportLeft:	
+	li t1, 300			# t1 = 300
+	bne a1, t1, dontTeleportRight	# se posX != 300, pula pra "dontTeleportRight"
+	li t1, 64			# t1 = 64
+	bne a2, t1, dontTeleportLeft	# se posY != 64, pula pra "dontTeleportRight"
+	li t1, 1			# t1 = 1
+	beq s0, t1, dontTeleportRight	# se movState == left, pula pra "dontTeleportRight"
+	li a1, 0			# usa o teleporte da direita
 dontTeleportRight:
-	mv a0, s10
-	mv s3, a1
-	mv s4, a2
-	call print
+	mv a0, s10			# a0 = endereco do Fuleco
+	mv s3, a1			# s3 = posX
+	mv s4, a2			# s4 = posY
+	call print			# printa fuleco
+    
+    # checa contato com os pontos
+	li t0, 320			# t0 = 320	
 	
-	li a0,76		# pausa de 76m segundos
+	add t2, s8, s3			# t2 = endereco + s3
+	mul t3, s4, t0			# t3 = s4*320
+	add t0, t2, t3			# t0 = t2 + t3 = endereco + a1 + a2*320
+	
+	lw t2, 8(t0)			# t2 = t0 + 4
+	andi t2, t2, 0x000FF		# t2 = 8 bits menos signficativos
+
+	li t1, 7			# t1 = 7	
+	bne t1, t2, dontAddPoints	# se t1 != t2, pula pra "dontAddPoints"
+	li t1, 17			# t1 = 17		 
+	sw t1, 8(t0)			# guarda 17 no endereco que a bolinha recem pegada estava
+	addi s1, s1, 1			# adiciona 1 ponto
+	li t1, 115			# t1 = 115
+	beq s1, t1, endGame		# se pontos == 115, acaba a run
+	
+dontAddPoints:
+	li t1, 192
+	bne t1, t2, dontBeSuper
+	li t1, 17
+	sw t1, 8(t0)
+	# trocar o estado de superfuleco
+	
+dontBeSuper:
+	li a0,76			# pausa de 76m segundos
 	li a7,32
 	ecall
 	
 	j loopgame
 	
-		
-	jr a6
+endGame:
+	mv ra, a6		
+	ret
 	
 .include "src/print.s"
 .include "src/checkCollision.s"
+.include "src/printProps.s"
+
+.data
+space: .string " "
+.include "sprites/props/arquivos .data/dot.data"
+.include "sprites/props/arquivos .data/brazuca.data"
+ 
 	
