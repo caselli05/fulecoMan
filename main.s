@@ -15,6 +15,7 @@ main:
     # print fuleco in start position
     	li s3, 144			# posX fuleco
     	li s4, 176			# posY fuleco
+    	mv a0, s10
 	li a1, 144
 	li a2, 176
 	call print
@@ -217,11 +218,25 @@ dontTeleportLeft:
 	beq s0, t1, dontTeleportRight	# se movState == left, pula pra "dontTeleportRight"
 	li a1, 0			# usa o teleporte da direita
 dontTeleportRight:
-	mv a0, s10			# a0 = endereco do Fuleco
+	li t0, 0
+	bne a3, t0, animation1
+	mv a0, s10			# a0 = endereco do Fuleco 0
 	mv s3, a1			# s3 = posX
 	mv s4, a2			# s4 = posY
 	call print			# printa fuleco
-    
+	li t0, 4096
+	add s10, s10, t0		# s10 = Fuleco 1
+animation1:
+	li t1, 1
+	bne t1, a3, checkPoints
+	mv a0, s10			# a0 = endereco do Fuleco 1
+	mv s3, a1			# s3 = posX
+	mv s4, a2			# s4 = posY
+	call print			# printa fuleco
+	li t0, 4096
+	sub s10, s10, t0
+
+checkPoints:
     # checa contato com os pontos
 	li t0, 320			# t0 = 320	
 	
