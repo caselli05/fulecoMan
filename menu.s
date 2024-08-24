@@ -108,6 +108,7 @@ gameOneStart:
 	la s8, testeCollision
 	la s9, map1
 	la s10, fixedFuleco0
+	la s11, fixedFuleco1
 	jal a6, main
 
 
