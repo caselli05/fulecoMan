@@ -107,8 +107,7 @@ DOIS:	lw a0, 0(a6)
 gameOneStart:
 	la s8, testeCollision
 	la s9, map1
-	la s10, fixedFuleco0
-	la s11, fixedFuleco1
+	la s10, fulecoLeft0
 	jal a6, main
 
 
@@ -128,8 +127,10 @@ NOTAS2: 36, 1600, 41, 1600, 33, 1600, 43, 1600, 36, 1600, 38, 1600, 40, 1600, 43
 
 .include "sprites/Menu/arquivos .data/menu.data"			# inclui o .data com a menu
 .include "sprites/Mapas/arquivos .data/map1.data"			# inclui o .data com o mapa 1
-.include "sprites/fuleco/arquivos .data/fixedFuleco0.data"		# inclui o .data com o Fuleco 0
-.include "sprites/fuleco/arquivos .data/fixedFuleco1.data"		# inclui o .data com o Fuleco 1
+.include "sprites/fuleco/arquivos .data/fulecoLeft0.data"		# inclui o .data com o Fuleco Left 0
+.include "sprites/fuleco/arquivos .data/fulecoLeft1.data"		# inclui o .data com o Fuleco Left 1
+.include "sprites/fuleco/arquivos .data/fulecoRight0.data"		# inclui o .data com o Fuleco Right 0
+.include "sprites/fuleco/arquivos .data/fulecoRight1.data"		# inclui o .data com o Fuleco Right 1
 .include "sprites/Mapas/arquivos .data/testeCollision.data"		# inclui o .data com as colisoes mapa
 
 

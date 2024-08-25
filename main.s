@@ -12,7 +12,7 @@ main:
 	li a3, 1
 	call print
 	
-    # print fuleco in start position
+    # set up Fuleco
     	la s0, fulecoInfo		# s0 = fulecoInfoAdress
     	li t0, 144			# t0 = 144
     	sw t0, 0(s0)			# guarda a posX inicial do fuleco em 0(s0)
@@ -26,6 +26,7 @@ main:
 	sw t4, 16(s0)			# comeca o superState para 0
 	li t5, 1			# t5 = 0
 	sw t5, 20(s0)			# comeca o frameAnimacao em 1
+	sw t4, 24(s0)			# comeca o leftOrRight em  0 (left)
 	
 	mv a0, s10
 	li a1, 144
@@ -141,7 +142,14 @@ goLeft:
 	lw t2, 8(s0)			# t2 = runningState
 	li t1, 1
 	bne t2, t1, goRight		# check if t2 = 1
+		
+	li t1, 0			# t1 = 0
+	lw t0, 24(s0)			# t0 = leftOrRight
+	beq t1, t0, dontChangeFulecoToLeft
+	addi s10, s10, -528		# s10 += 528
+	sw t1, 24(s0)			# leftOrRight = 0 (left)
 	
+dontChangeFulecoToLeft:
 	addi a1, a1, -4			# update temporario da posicao para 4 pixels para esquerda
 	call checkCollision		# check da colisao superior esquerda
 	li t0, 0			# t0 = 0
@@ -163,6 +171,13 @@ goRight:
 	lw t2, 8(s0)			# t2 = runnning state
 	bne t2, t1, goUp		# check if t2 = 2
 	
+	li t1, 1			# t1 = 1
+	lw t0, 24(s0)			# t0 = leftOrRight
+	beq t1, t0, dontChangeFulecoToRight
+	addi s10, s10, 528		# s10 += 528
+	sw t1, 24(s0)			# leftOrRight = 1 (right)
+	
+dontChangeFulecoToRight:
 	addi a1, a1, 16			# update temporario do eixo X para a direita 
 	call checkCollision		# check de colisao superior direita
 	addi a1, a1, -16		# cancela o update temporario do eixo X para a direita
@@ -235,8 +250,11 @@ dontTeleportLeft:
 	beq s0, t1, dontTeleportRight	# se movState == left, pula pra "dontTeleportRight"
 	li a1, 0			# usa o teleporte da direita
 dontTeleportRight:
-	li t0, 1
+	li t0, 1			# t0 = 1
 	beq t0, a3, dontChangeFrameAnimacao
+	li t0, 0			# t0 = 0
+	lw t1, 8(s0)			# t1 = runningState
+	beq t0, t1, dontChangeFrameAnimacao
 	lw t0, 20(s0)			# t0 = frameAnimacao
 	li t1, 264			# t1 = 264
 	mul t1, t1, t0			# t0 = +/- 264
@@ -293,7 +311,7 @@ endGame:
 .include "src/printProps.s"
 
 .data
-fulecoInfo: .word 144, 176, 0, 0, 0, 1	# posX, posY, runningState, points, superState, frameAnimacao
+fulecoInfo: .word 144, 176, 0, 0, 0, 1, 0	# posX, posY, runningState, points, superState, frameAnimacao, leftOrRight
 space: .string " "
 .include "sprites/props/arquivos .data/dot.data"
 .include "sprites/props/arquivos .data/brazuca.data"
