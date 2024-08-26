@@ -239,7 +239,8 @@ pass:
 	li t1, 64			# t1 = 64
 	bne a2, t1, dontTeleportLeft	# se posY != 64, pula pra "dontTeleportLeft"
 	li t1, 2			# t1 = 2
-	beq s0, t1, dontTeleportLeft	# se movState == right, pula pra "dontTeleportLeft" 
+	lw t0, 8(s0)
+	beq t0, t1, dontTeleportLeft	# se movState == right, pula pra "dontTeleportLeft" 
 	li a1, 288			# usa o teleporte da esquerda
 dontTeleportLeft:	
 	li t1, 300			# t1 = 300
@@ -247,9 +248,24 @@ dontTeleportLeft:
 	li t1, 64			# t1 = 64
 	bne a2, t1, dontTeleportLeft	# se posY != 64, pula pra "dontTeleportRight"
 	li t1, 1			# t1 = 1
-	beq s0, t1, dontTeleportRight	# se movState == left, pula pra "dontTeleportRight"
+	lw t0, 8(s0)
+	beq t0, t1, dontTeleportRight	# se movState == left, pula pra "dontTeleportRight"
 	li a1, 0			# usa o teleporte da direita
 dontTeleportRight:
+	li t1, 12
+	bge a2, t1, dontTeleportUp
+	li t1, 4
+	lw t0, 8(s0)
+	beq t0, t1, dontTeleportUp
+	li a2, 228
+dontTeleportUp:
+	li t1, 228
+	bne a2, t1, dontTeleportDown
+	li t1, 3
+	lw t0, 8(s0)
+	beq t0, t1, dontTeleportDown
+	li a2, 12 
+dontTeleportDown:
 	li t0, 1			# t0 = 1
 	beq t0, a3, dontChangeFrameAnimacao
 	li t0, 0			# t0 = 0
