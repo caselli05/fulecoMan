@@ -18,6 +18,7 @@
 # a6 = contador de notas2
 
 .text
+COMECO: 
     # Setup musica
 	la s2, NUM		# define o endereco do numero de notas
 	lw s3, 0(s2)		# numero de notas
@@ -72,7 +73,7 @@ LOOP2:	li t1,0xFF200000	# carrega o endereco de controle do KDMMIO
   	lw t2,4(t1)  		# le o valor da tecla tecla
 	sw t2,12(t1)  		# escreve a tecla pressionada no display
 	beq t2, t3, gameOneStart# vai pro mapa 1
-	beq t2, t4, end		# "hack" pro mapa 2
+	beq t2, t4, gameTwoStart# "hack" pro mapa 2
 	
     #toca a musica
 MUSIC:	beq t5, s3, FORA
@@ -105,11 +106,18 @@ DOIS:	lw a0, 0(a6)
 	
 	
 gameOneStart:
-	la s8, testeCollision
+	la s8, map1Collision
 	la s9, map1
 	la s10, fulecoLeft0
-	jal a6, main
-
+	call main
+	
+gameTwoStart:
+	la s8, map2Collision
+	la s9, map2
+	la s10, fulecoLeft0
+	call main
+	
+	j COMECO
 
 end:
 	li a7, 10
@@ -127,11 +135,13 @@ NOTAS2: 36, 1600, 41, 1600, 33, 1600, 43, 1600, 36, 1600, 38, 1600, 40, 1600, 43
 
 .include "sprites/Menu/arquivos .data/menu.data"			# inclui o .data com a menu
 .include "sprites/Mapas/arquivos .data/map1.data"			# inclui o .data com o mapa 1
+.include "sprites/Mapas/arquivos .data/map1Collision.data"		# inclui o .data com as colisoes mapa 1
+.include "sprites/Mapas/arquivos .data/map2.data"			# inclui o .data com o mapa 2
+.include "sprites/Mapas/arquivos .data/map2Collision.data"		# inclui o .data com as colisoes mapa 2
 .include "sprites/fuleco/arquivos .data/fulecoLeft0.data"		# inclui o .data com o Fuleco Left 0
 .include "sprites/fuleco/arquivos .data/fulecoLeft1.data"		# inclui o .data com o Fuleco Left 1
 .include "sprites/fuleco/arquivos .data/fulecoRight0.data"		# inclui o .data com o Fuleco Right 0
 .include "sprites/fuleco/arquivos .data/fulecoRight1.data"		# inclui o .data com o Fuleco Right 1
-.include "sprites/Mapas/arquivos .data/testeCollision.data"		# inclui o .data com as colisoes mapa
 
 
 
