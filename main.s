@@ -1,5 +1,5 @@
 main:
-	mv a6, ra
+	mv a6, ra			# a6 = return adress
     # print map in frame 0
     	mv a0, s9
 	li a1, 0
@@ -12,17 +12,28 @@ main:
 	li a3, 1
 	call print
 	
-    # print fuleco in start position
-    	li s3, 144			# posX fuleco
-    	li s4, 176			# posY fuleco
+    # set up Fuleco
+    	la s0, fulecoInfo		# s0 = fulecoInfoAdress
+    	li t0, 144			# t0 = 144
+    	sw t0, 0(s0)			# guarda a posX inicial do fuleco em 0(s0)
+	li t1, 176			# t1 = 176
+	sw t1, 4(s0)			# guarda a posY inicial do fulecom em 4(s0)
+	li t2, 0			# t2 = 0
+	sw t2, 8(s0)			# comeca o runningState para 0
+	li t3, 0			# t3 = 0
+	sw t3, 12(s0)			# comeca os pontos para 0
+	li t4, 0			# t4 = 0
+	sw t4, 16(s0)			# comeca o superState para 0
+	li t5, 1			# t5 = 0
+	sw t5, 20(s0)			# comeca o frameAnimacao em 1
+	sw t4, 24(s0)			# comeca o leftOrRight em  0 (left)
+	
+	mv a0, s10
 	li a1, 144
 	li a2, 176
 	call print
 	
-	
-	li s0, 0			# s0 = runing state : 0 = stop // 1 = left // 2 = right // 3 = up // 4 = down
-	li s1, 0
-	
+	li a3, 0
 loopgame:
 	xori a3, a3, 1			# change frame 0 <--> 1
     # print map
@@ -38,8 +49,8 @@ loopgame:
     	call printProps 
 
 input:
-	mv a1, s3
-	mv a2, s4
+	lw a1, 0(s0)			# pega a posX e guarda em a1
+	lw a2, 4(s0)			# pega a posY e gurada em a2
 	
 	li t2, 0
 	li t1,0xFF200000		# load KDMMIO andress
@@ -50,7 +61,7 @@ input:
 	sw t2,12(t1)  			# escreve a tecla pressionada no display    		
 		
 clickLeft:
-	mv a0, s8
+	mv a0, s8			# a0 = testeCollision
 
 	li t1, 'a'
 	bne t2, t1, clickRight		# verifica se foi apertado a tecla 'a'
@@ -67,7 +78,8 @@ clickLeft:
 	addi a2, a2, -12		# cancela o update temporario do eixo Y
 	beqz t1, goLeft			# se ha colisao, pula para "goLeft"
 	
-	li s0, 1			# muda o s0 para 1
+	li t1, 1
+	sw t1, 8(s0)			# muda o runningState para 1
 clickRight:
 	li t1, 'd'
 	bne t2, t1, clickUp		# verirfica se foi apertado a tecla 'd'
@@ -85,7 +97,8 @@ clickRight:
 	addi a2, a2, -12		# cancela o update temporario do eixo Y para a esquerda	
 	beqz t1, goLeft			# se ha colisao, pula para "goLeft"
 	
-	li s0, 2
+	li t1, 2
+	sw t1, 8(s0)			# muda o runningState para 2
 clickUp:	
 	li t1, 'w'
 	bne t2, t1, clickDown		# verifica se foi apertado a tecla 'w'
@@ -102,7 +115,8 @@ clickUp:
 	addi a1, a1, -12		# cancela o update temporario do eixo X
 	beqz t1, goLeft			# se ha colisao, pula para "goLeft"
 	
-	li s0, 3
+	li t1, 3
+	sw t1, 8(s0)			# muda o runningState para 3
 clickDown:
 	li t1, 's'
 	bne t2, t1, goLeft
@@ -119,14 +133,23 @@ clickDown:
 	addi a1, a1, -12		# cancela o update temporario do eixo X
 	beqz t1, goLeft			# se ha colisao, pula para "goLeft"
 	
-	li s0, 4
+	li t1, 4
+	sw t1, 8(s0)			# muda o runningState para  4
 	
 goLeft:
 	mv a0, s8
 
+	lw t2, 8(s0)			# t2 = runningState
 	li t1, 1
-	bne s0, t1, goRight		# check if s0 = 1
+	bne t2, t1, goRight		# check if t2 = 1
+		
+	li t1, 0			# t1 = 0
+	lw t0, 24(s0)			# t0 = leftOrRight
+	beq t1, t0, dontChangeFulecoToLeft
+	addi s10, s10, -528		# s10 += 528
+	sw t1, 24(s0)			# leftOrRight = 0 (left)
 	
+dontChangeFulecoToLeft:
 	addi a1, a1, -4			# update temporario da posicao para 4 pixels para esquerda
 	call checkCollision		# check da colisao superior esquerda
 	li t0, 0			# t0 = 0
@@ -145,8 +168,16 @@ goLeft:
 	
 goRight:
 	li t1, 2
-	bne s0, t1, goUp		# check if s0 = 2
+	lw t2, 8(s0)			# t2 = runnning state
+	bne t2, t1, goUp		# check if t2 = 2
 	
+	li t1, 1			# t1 = 1
+	lw t0, 24(s0)			# t0 = leftOrRight
+	beq t1, t0, dontChangeFulecoToRight
+	addi s10, s10, 528		# s10 += 528
+	sw t1, 24(s0)			# leftOrRight = 1 (right)
+	
+dontChangeFulecoToRight:
 	addi a1, a1, 16			# update temporario do eixo X para a direita 
 	call checkCollision		# check de colisao superior direita
 	addi a1, a1, -16		# cancela o update temporario do eixo X para a direita
@@ -164,7 +195,8 @@ goRight:
 	addi a1, a1, 4			# update da posicao para 4 pixels para a direita	
 goUp:	
 	li t1, 3
-	bne s0, t1, goDown		# check if s0 = 3
+	lw t2, 8(s0)			# t2 = runningState
+	bne t2, t1, goDown		# check if t2 = 3
 	
 	addi a2, a2, -4			# update temporario do eixo Y para cima
 	call checkCollision		# check de colisao superior equerda
@@ -183,7 +215,8 @@ goUp:
 	addi a2, a2, -4			# update da posicao para 4 pixels para a cima
 goDown:
 	li t1, 4
-	bne s0, t1, pass		# check if s0 = 4
+	lw t2, 8(s0)			# t2 = runningState	
+	bne t2, t1, pass		# check if t2 = 4
 	
 	addi a2, a2, 16			# update temporario do eixo Y para baixo
 	call checkCollision		# check de colisao inferior equerda
@@ -206,7 +239,8 @@ pass:
 	li t1, 64			# t1 = 64
 	bne a2, t1, dontTeleportLeft	# se posY != 64, pula pra "dontTeleportLeft"
 	li t1, 2			# t1 = 2
-	beq s0, t1, dontTeleportLeft	# se movState == right, pula pra "dontTeleportLeft" 
+	lw t0, 8(s0)
+	beq t0, t1, dontTeleportLeft	# se movState == right, pula pra "dontTeleportLeft" 
 	li a1, 288			# usa o teleporte da esquerda
 dontTeleportLeft:	
 	li t1, 300			# t1 = 300
@@ -214,19 +248,47 @@ dontTeleportLeft:
 	li t1, 64			# t1 = 64
 	bne a2, t1, dontTeleportLeft	# se posY != 64, pula pra "dontTeleportRight"
 	li t1, 1			# t1 = 1
-	beq s0, t1, dontTeleportRight	# se movState == left, pula pra "dontTeleportRight"
+	lw t0, 8(s0)
+	beq t0, t1, dontTeleportRight	# se movState == left, pula pra "dontTeleportRight"
 	li a1, 0			# usa o teleporte da direita
 dontTeleportRight:
+	li t1, 12
+	bge a2, t1, dontTeleportUp
+	li t1, 4
+	lw t0, 8(s0)
+	beq t0, t1, dontTeleportUp
+	li a2, 228
+dontTeleportUp:
+	li t1, 228
+	bne a2, t1, dontTeleportDown
+	li t1, 3
+	lw t0, 8(s0)
+	beq t0, t1, dontTeleportDown
+	li a2, 12 
+dontTeleportDown:
+	li t0, 1			# t0 = 1
+	beq t0, a3, dontChangeFrameAnimacao
+	li t0, 0			# t0 = 0
+	lw t1, 8(s0)			# t1 = runningState
+	beq t0, t1, dontChangeFrameAnimacao
+	lw t0, 20(s0)			# t0 = frameAnimacao
+	li t1, 264			# t1 = 264
+	mul t1, t1, t0			# t0 = +/- 264
+	add s10, s10, t1		# muda o sprite para ser animado
+	li t1, -1			# t1= -1
+	mul t0, t0, t1			# t0 *= -1
+	sw t0, 20(s0)			# guarda t0 em frameAnimacao
+	
+dontChangeFrameAnimacao:
 	mv a0, s10			# a0 = endereco do Fuleco
-	mv s3, a1			# s3 = posX
-	mv s4, a2			# s4 = posY
+	sw a1, 0(s0)			# posX = a1
+	sw a2, 4(s0)			# posY = a2
 	call print			# printa fuleco
-    
     # checa contato com os pontos
 	li t0, 320			# t0 = 320	
 	
-	add t2, s8, s3			# t2 = endereco + s3
-	mul t3, s4, t0			# t3 = s4*320
+	add t2, s8, a1			# t2 = endereco + a1
+	mul t3, a2, t0			# t3 = a2*320
 	add t0, t2, t3			# t0 = t2 + t3 = endereco + a1 + a2*320
 	
 	lw t2, 8(t0)			# t2 = t0 + 4
@@ -236,9 +298,11 @@ dontTeleportRight:
 	bne t1, t2, dontAddPoints	# se t1 != t2, pula pra "dontAddPoints"
 	li t1, 17			# t1 = 17		 
 	sw t1, 8(t0)			# guarda 17 no endereco que a bolinha recem pegada estava
-	addi s1, s1, 1			# adiciona 1 ponto
+	lw t0, 12(s0)			# t0 = pontos
+	addi t0, t0, 1			# adiciona 1 ponto
+	sw t0, 12(s0)			# guarda os pontos
 	li t1, 115			# t1 = 115
-	beq s1, t1, endGame		# se pontos == 115, acaba a run
+	beq t0, t1, endGame		# se pontos == 115, acaba a run
 	
 dontAddPoints:
 	li t1, 192
@@ -263,6 +327,7 @@ endGame:
 .include "src/printProps.s"
 
 .data
+fulecoInfo: .word 144, 176, 0, 0, 0, 1, 0	# posX, posY, runningState, points, superState, frameAnimacao, leftOrRight
 space: .string " "
 .include "sprites/props/arquivos .data/dot.data"
 .include "sprites/props/arquivos .data/brazuca.data"
