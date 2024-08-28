@@ -34,7 +34,20 @@ main:
 	call print
 	
 	li a3, 0
+resetMusic:	
+	li a5, 0			# a5 = 0 (contador de notas)
+	mv a4, s2
 loopgame:
+	beq a5, s3, resetMusic		# se a5 == s3, a5 = 0 e a4 = s2
+	
+	lw a0, 0(a4)
+	li a7, 31
+	ecall
+
+	addi a4, a4, 8
+	addi a5, a5, 1
+	
+	
 	xori a3, a3, 1			# change frame 0 <--> 1
     # print map
     	mv a0, s9
