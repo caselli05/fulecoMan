@@ -12,21 +12,21 @@ main:
 	li a3, 1
 	call print
 	
-    # set up Fuleco
-    	la s0, fulecoInfo		# s0 = fulecoInfoAdress
+    # setup Fuleco
+    	la s11, fulecoInfo		# s11 = fulecoInfoAdress
     	li t0, 144			# t0 = 144
-    	sw t0, 0(s0)			# guarda a posX inicial do fuleco em 0(s0)
+    	sw t0, 0(s11)			# guarda a posX inicial do fuleco em 0(s11)
 	li t1, 176			# t1 = 176
-	sw t1, 4(s0)			# guarda a posY inicial do fulecom em 4(s0)
+	sw t1, 4(s11)			# guarda a posY inicial do fulecom em 4(s11)
 	li t2, 0			# t2 = 0
-	sw t2, 8(s0)			# comeca o runningState para 0
+	sw t2, 8(s11)			# comeca o runningState para 0
 	li t3, 0			# t3 = 0
-	sw t3, 12(s0)			# comeca os pontos para 0
+	sw t3, 12(s11)			# comeca os pontos para 0
 	li t4, 0			# t4 = 0
-	sw t4, 16(s0)			# comeca o superState para 0
+	sw t4, 16(s11)			# comeca o superState para 0
 	li t5, 1			# t5 = 0
-	sw t5, 20(s0)			# comeca o frameAnimacao em 1
-	sw t4, 24(s0)			# comeca o leftOrRight em  0 (left)
+	sw t5, 20(s11)			# comeca o frameAnimacao em 1
+	sw t4, 24(s11)			# comeca o leftOrRight em  0 (left)
 	
 	mv a0, s10
 	li a1, 144
@@ -49,8 +49,8 @@ loopgame:
     	call printProps 
 
 input:
-	lw a1, 0(s0)			# pega a posX e guarda em a1
-	lw a2, 4(s0)			# pega a posY e gurada em a2
+	lw a1, 0(s11)			# pega a posX e guarda em a1
+	lw a2, 4(s11)			# pega a posY e gurada em a2
 	
 	li t2, 0
 	li t1,0xFF200000		# load KDMMIO andress
@@ -79,7 +79,7 @@ clickLeft:
 	beqz t1, goLeft			# se ha colisao, pula para "goLeft"
 	
 	li t1, 1
-	sw t1, 8(s0)			# muda o runningState para 1
+	sw t1, 8(s11)			# muda o runningState para 1
 clickRight:
 	li t1, 'd'
 	bne t2, t1, clickUp		# verirfica se foi apertado a tecla 'd'
@@ -98,7 +98,7 @@ clickRight:
 	beqz t1, goLeft			# se ha colisao, pula para "goLeft"
 	
 	li t1, 2
-	sw t1, 8(s0)			# muda o runningState para 2
+	sw t1, 8(s11)			# muda o runningState para 2
 clickUp:	
 	li t1, 'w'
 	bne t2, t1, clickDown		# verifica se foi apertado a tecla 'w'
@@ -116,7 +116,7 @@ clickUp:
 	beqz t1, goLeft			# se ha colisao, pula para "goLeft"
 	
 	li t1, 3
-	sw t1, 8(s0)			# muda o runningState para 3
+	sw t1, 8(s11)			# muda o runningState para 3
 clickDown:
 	li t1, 's'
 	bne t2, t1, goLeft
@@ -134,20 +134,20 @@ clickDown:
 	beqz t1, goLeft			# se ha colisao, pula para "goLeft"
 	
 	li t1, 4
-	sw t1, 8(s0)			# muda o runningState para  4
+	sw t1, 8(s11)			# muda o runningState para  4
 	
 goLeft:
 	mv a0, s8
 
-	lw t2, 8(s0)			# t2 = runningState
+	lw t2, 8(s11)			# t2 = runningState
 	li t1, 1
 	bne t2, t1, goRight		# check if t2 = 1
 		
 	li t1, 0			# t1 = 0
-	lw t0, 24(s0)			# t0 = leftOrRight
+	lw t0, 24(s11)			# t0 = leftOrRight
 	beq t1, t0, dontChangeFulecoToLeft
 	addi s10, s10, -528		# s10 += 528
-	sw t1, 24(s0)			# leftOrRight = 0 (left)
+	sw t1, 24(s11)			# leftOrRight = 0 (left)
 	
 dontChangeFulecoToLeft:
 	addi a1, a1, -4			# update temporario da posicao para 4 pixels para esquerda
@@ -168,14 +168,14 @@ dontChangeFulecoToLeft:
 	
 goRight:
 	li t1, 2
-	lw t2, 8(s0)			# t2 = runnning state
+	lw t2, 8(s11)			# t2 = runnning state
 	bne t2, t1, goUp		# check if t2 = 2
 	
 	li t1, 1			# t1 = 1
-	lw t0, 24(s0)			# t0 = leftOrRight
+	lw t0, 24(s11)			# t0 = leftOrRight
 	beq t1, t0, dontChangeFulecoToRight
 	addi s10, s10, 528		# s10 += 528
-	sw t1, 24(s0)			# leftOrRight = 1 (right)
+	sw t1, 24(s11)			# leftOrRight = 1 (right)
 	
 dontChangeFulecoToRight:
 	addi a1, a1, 16			# update temporario do eixo X para a direita 
@@ -195,7 +195,7 @@ dontChangeFulecoToRight:
 	addi a1, a1, 4			# update da posicao para 4 pixels para a direita	
 goUp:	
 	li t1, 3
-	lw t2, 8(s0)			# t2 = runningState
+	lw t2, 8(s11)			# t2 = runningState
 	bne t2, t1, goDown		# check if t2 = 3
 	
 	addi a2, a2, -4			# update temporario do eixo Y para cima
@@ -215,7 +215,7 @@ goUp:
 	addi a2, a2, -4			# update da posicao para 4 pixels para a cima
 goDown:
 	li t1, 4
-	lw t2, 8(s0)			# t2 = runningState	
+	lw t2, 8(s11)			# t2 = runningState	
 	bne t2, t1, pass		# check if t2 = 4
 	
 	addi a2, a2, 16			# update temporario do eixo Y para baixo
@@ -239,7 +239,7 @@ pass:
 	li t1, 64			# t1 = 64
 	bne a2, t1, dontTeleportLeft	# se posY != 64, pula pra "dontTeleportLeft"
 	li t1, 2			# t1 = 2
-	lw t0, 8(s0)
+	lw t0, 8(s11)
 	beq t0, t1, dontTeleportLeft	# se movState == right, pula pra "dontTeleportLeft" 
 	li a1, 288			# usa o teleporte da esquerda
 dontTeleportLeft:	
@@ -248,41 +248,41 @@ dontTeleportLeft:
 	li t1, 64			# t1 = 64
 	bne a2, t1, dontTeleportLeft	# se posY != 64, pula pra "dontTeleportRight"
 	li t1, 1			# t1 = 1
-	lw t0, 8(s0)
+	lw t0, 8(s11)
 	beq t0, t1, dontTeleportRight	# se movState == left, pula pra "dontTeleportRight"
 	li a1, 0			# usa o teleporte da direita
 dontTeleportRight:
 	li t1, 12
 	bge a2, t1, dontTeleportUp
 	li t1, 4
-	lw t0, 8(s0)
+	lw t0, 8(s11)
 	beq t0, t1, dontTeleportUp
 	li a2, 228
 dontTeleportUp:
 	li t1, 228
 	bne a2, t1, dontTeleportDown
 	li t1, 3
-	lw t0, 8(s0)
+	lw t0, 8(s11)
 	beq t0, t1, dontTeleportDown
 	li a2, 12 
 dontTeleportDown:
 	li t0, 1			# t0 = 1
 	beq t0, a3, dontChangeFrameAnimacao
 	li t0, 0			# t0 = 0
-	lw t1, 8(s0)			# t1 = runningState
+	lw t1, 8(s11)			# t1 = runningState
 	beq t0, t1, dontChangeFrameAnimacao
-	lw t0, 20(s0)			# t0 = frameAnimacao
+	lw t0, 20(s11)			# t0 = frameAnimacao
 	li t1, 264			# t1 = 264
 	mul t1, t1, t0			# t0 = +/- 264
 	add s10, s10, t1		# muda o sprite para ser animado
 	li t1, -1			# t1= -1
 	mul t0, t0, t1			# t0 *= -1
-	sw t0, 20(s0)			# guarda t0 em frameAnimacao
+	sw t0, 20(s11)			# guarda t0 em frameAnimacao
 	
 dontChangeFrameAnimacao:
 	mv a0, s10			# a0 = endereco do Fuleco
-	sw a1, 0(s0)			# posX = a1
-	sw a2, 4(s0)			# posY = a2
+	sw a1, 0(s11)			# posX = a1
+	sw a2, 4(s11)			# posY = a2
 	call print			# printa fuleco
     # checa contato com os pontos
 	li t0, 320			# t0 = 320	
@@ -298,9 +298,9 @@ dontChangeFrameAnimacao:
 	bne t1, t2, dontAddPoints	# se t1 != t2, pula pra "dontAddPoints"
 	li t1, 17			# t1 = 17		 
 	sw t1, 8(t0)			# guarda 17 no endereco que a bolinha recem pegada estava
-	lw t0, 12(s0)			# t0 = pontos
+	lw t0, 12(s11)			# t0 = pontos
 	addi t0, t0, 1			# adiciona 1 ponto
-	sw t0, 12(s0)			# guarda os pontos
+	sw t0, 12(s11)			# guarda os pontos
 	li t1, 115			# t1 = 115
 	beq t0, t1, endGame		# se pontos == 115, acaba a run
 	
