@@ -1,21 +1,17 @@
 ###############
-# s0 = Frame 0
-# s1 = Frame 1
+# s0 =
+# s1 = 
 # s2 = endereco das notas
 # s3 = numero de notas
-# s4 = endereco das notas2
-# s5 = numero de notas 2
-# s6 = contador de 16
-# s7
-# s8
-# s9 
-# s10
-# s11 =
-# a2 = instrumento para notas
-# a4 = instrumento para notas2 
-# a3 = volume para notas
-# a5 = contador de notas
-# a6 = contador de notas2
+# s4 =
+# s5 =
+# s6 =
+# s7 = 
+# s8 = mapa
+# s9 = mapacColisao
+# s10 = sprite fuleco
+# s11 = fulecoInfo
+
 
 .text
 COMECO: 
@@ -24,14 +20,9 @@ COMECO:
 	lw s3, 0(s2)		# numero de notas
 	la s2, NOTAS		#define o endereco das notas
 	
-	la s4, NUM2		# definde o endereco do numero de notas2
-	lw s5, 0(s4)		# le o numero de notas2
-	la s4, NOTAS2		# define o endereco das notas2
-	
 	li a2, 32		# define o instrumento para notas
-	li a4, 128		# define o instrumento para notas2 
 	li a3, 127		# define o volume para notas
-	li s6, 16		# contador de 16 para notas 2
+
 	
     # Setup tela 
 	li s0,0xFF000000	# Frame0
@@ -63,7 +54,6 @@ FORA:	li s0,0xFF200604	# Escolhe o Frame 0 ou 1
 	li t5, 0
 	li t6, 0
 	mv a5, s2
-	mv a6, s4
 	
 	#verifica a tecla pressioanda
 LOOP2:	li t1,0xFF200000	# carrega o endereco de controle do KDMMIO
@@ -77,7 +67,6 @@ LOOP2:	li t1,0xFF200000	# carrega o endereco de controle do KDMMIO
 	
     #toca a musica
 MUSIC:	beq t5, s3, FORA
-	beq t5, s6, DOIS
 	
 MUSIC2:	lw a0, 0(a5)
 	lw a1, 4(a5)
@@ -94,24 +83,15 @@ MUSIC2:	lw a0, 0(a5)
 	
 	j LOOP2
 	
-DOIS:	lw a0, 0(a6)
-	lw a1, 4(a6)
-	li a7, 31
-	ecall
-	
-	addi s6, s6, 8
-	addi a6, a6, 8
-	addi t5, t5, 1
-	j MUSIC2
-	
-	
 gameOneStart:
+    # setup dos sprites
 	la s8, map1Collision
 	la s9, map1
 	la s10, fulecoLeft0
 	call main
 	
 gameTwoStart:
+    # setup dos sprites
 	la s8, map2Collision
 	la s9, map2
 	la s10, fulecoLeft0
@@ -128,10 +108,8 @@ end:
 .data
 # Numero de Notas a tocar
 NUM: .word 160
-NUM2: .word 20
 # lista de nota,duracao,nota,duraaoo,nota,duraaoo,...
 NOTAS: 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 55, 200, 53, 200, 52, 200, 50, 200, 48, 200, 50, 200, 52, 200, 55, 200, 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 62, 200, 59, 200, 57, 200, 55, 200, 60, 200, 55, 200, 59, 200, 55, 200, 64, 200, 52, 200, 50, 200, 60, 200, 48, 200, 47, 200, 60, 200, 50, 200, 65, 200, 53, 200, 52, 200, 60, 200, 50, 200, 48, 200, 60, 200, 52, 200, 67, 200, 55, 200, 52, 200, 65, 200, 50, 200, 48, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 55, 200, 60, 200, 55, 200, 59, 200, 55, 200, 64, 200, 52, 200, 50, 200, 60, 200, 48, 200, 47, 200, 60, 200, 50, 200, 65, 200, 53, 200, 52, 200, 60, 200, 50, 200, 48, 200, 60, 200, 52, 200, 67, 200, 55, 200, 52, 200, 65, 200, 50, 200, 48, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 64, 200, 62, 200, 55, 200, 60, 200, 59, 200, 64, 200, 52, 200, 50, 200, 52, 200, 55, 200, 52, 200, 72, 200, 55, 200, 69, 200, 57, 200, 55, 200, 69, 200, 69, 200, 67, 200, 64, 200, 62, 200, 64, 200, 52, 200, 60, 200, 48, 200, 62, 200, 50, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 55, 200, 53, 200, 52, 200, 50, 200, 48, 200, 64, 200, 52, 200, 50, 200, 52, 200, 55, 200, 52, 200, 72, 200, 55, 200, 69, 200, 57, 200, 55, 200, 69, 200, 69, 200, 67, 200, 64, 200, 62, 200, 64, 200, 52, 200, 60, 200, 48, 200, 62, 200, 50, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 64, 200, 62, 200, 50, 200, 60, 200, 59, 200 
-NOTAS2: 36, 1600, 41, 1600, 33, 1600, 43, 1600, 36, 1600, 38, 1600, 40, 1600, 43, 1600, 36, 1600, 38, 1600, 40, 1600, 43, 1600, 36, 1600, 41, 1600, 33, 1600, 43, 1600, 36, 1600, 41, 1600, 33, 1600, 43, 1600 
 
 .include "sprites/Menu/arquivos .data/menu.data"			# inclui o .data com a menu
 .include "sprites/Mapas/arquivos .data/map1.data"			# inclui o .data com o mapa 1
@@ -149,5 +127,4 @@ NOTAS2: 36, 1600, 41, 1600, 33, 1600, 43, 1600, 36, 1600, 38, 1600, 40, 1600, 43
 	
 	
 	
-
 
