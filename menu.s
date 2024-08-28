@@ -112,14 +112,22 @@ NUM: .word 160
 NOTAS: 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 55, 200, 53, 200, 52, 200, 50, 200, 48, 200, 50, 200, 52, 200, 55, 200, 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 62, 200, 59, 200, 57, 200, 55, 200, 60, 200, 55, 200, 59, 200, 55, 200, 64, 200, 52, 200, 50, 200, 60, 200, 48, 200, 47, 200, 60, 200, 50, 200, 65, 200, 53, 200, 52, 200, 60, 200, 50, 200, 48, 200, 60, 200, 52, 200, 67, 200, 55, 200, 52, 200, 65, 200, 50, 200, 48, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 55, 200, 60, 200, 55, 200, 59, 200, 55, 200, 64, 200, 52, 200, 50, 200, 60, 200, 48, 200, 47, 200, 60, 200, 50, 200, 65, 200, 53, 200, 52, 200, 60, 200, 50, 200, 48, 200, 60, 200, 52, 200, 67, 200, 55, 200, 52, 200, 65, 200, 50, 200, 48, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 64, 200, 62, 200, 55, 200, 60, 200, 59, 200, 64, 200, 52, 200, 50, 200, 52, 200, 55, 200, 52, 200, 72, 200, 55, 200, 69, 200, 57, 200, 55, 200, 69, 200, 69, 200, 67, 200, 64, 200, 62, 200, 64, 200, 52, 200, 60, 200, 48, 200, 62, 200, 50, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 55, 200, 53, 200, 52, 200, 50, 200, 48, 200, 64, 200, 52, 200, 50, 200, 52, 200, 55, 200, 52, 200, 72, 200, 55, 200, 69, 200, 57, 200, 55, 200, 69, 200, 69, 200, 67, 200, 64, 200, 62, 200, 64, 200, 52, 200, 60, 200, 48, 200, 62, 200, 50, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 64, 200, 62, 200, 50, 200, 60, 200, 59, 200 
 
 .include "sprites/Menu/arquivos .data/menu.data"			# inclui o .data com a menu
+    # Mapa 1
 .include "sprites/Mapas/arquivos .data/map1.data"			# inclui o .data com o mapa 1
 .include "sprites/Mapas/arquivos .data/map1Collision.data"		# inclui o .data com as colisoes mapa 1
+    # Mapa 2
 .include "sprites/Mapas/arquivos .data/map2.data"			# inclui o .data com o mapa 2
 .include "sprites/Mapas/arquivos .data/map2Collision.data"		# inclui o .data com as colisoes mapa 2
+    # Sprites do Fuleco
 .include "sprites/fuleco/arquivos .data/fulecoLeft0.data"		# inclui o .data com o Fuleco Left 0
 .include "sprites/fuleco/arquivos .data/fulecoLeft1.data"		# inclui o .data com o Fuleco Left 1
 .include "sprites/fuleco/arquivos .data/fulecoRight0.data"		# inclui o .data com o Fuleco Right 0
 .include "sprites/fuleco/arquivos .data/fulecoRight1.data"		# inclui o .data com o Fuleco Right 1
+
+.include "sprites/fuleco/arquivos .data/fulecoBallLeft0.data"		# inclui o .data com o Fuleco Ball Left 0
+.include "sprites/fuleco/arquivos .data/fulecoBallLeft1.data"		# inclui o .data com o Fuleco Ball Left 1
+.include "sprites/fuleco/arquivos .data/fulecoBallRight0.data"		# inclui o .data com o Fuleco Ball Right 0
+.include "sprites/fuleco/arquivos .data/fulecoBallRight1.data"		# inclui o .data com o Fuleco Ball Right 1
 
 
 
