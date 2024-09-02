@@ -33,6 +33,18 @@ main:
 	li a2, 176
 	call print
 	
+    # setup Boateng
+    	la s1, germanyInfo		# s1 = germanyInfo
+    	li t1, 114			# t1 = 144
+    	li t2, 128			# t2 = 128
+    	sw t1, 0(s1)			# posXBoa = 144
+    	sw t2, 4(s1)			# posYBoa = 128
+    	li t1, -13			
+    	sw t1, 8(s1)			# timeOutBoa = -130
+	li t0, 0			
+	sw t0, 12(s1)			# comeca o leftOrRightBoa em 0(left)
+	
+	
 	li a3, 0
 loopgame:
 	xori a3, a3, 1			# change frame 0 <--> 1
@@ -49,6 +61,7 @@ loopgame:
     	call printProps 
 
 input:
+    # get input
 	lw a1, 0(s11)			# pega a posX e guarda em a1
 	lw a2, 4(s11)			# pega a posY e gurada em a2
 	
@@ -136,6 +149,7 @@ clickDown:
 	li t1, 4
 	sw t1, 8(s11)			# muda o runningState para  4
 	
+    # fuleco
 goLeft:
 	mv a0, s8
 
@@ -328,6 +342,208 @@ dontBeSuper:
 	sub s10, s10, t0		# s10 -= 1056
 		
 isNotSuper:
+    # Boateng
+    	lw t0, 8(s1)			# t0 = timeOutBoateng
+    	bgtz t0, dontStartBoa		# if t0 > 0, pula pra dontStartBoa
+    	addi t0, t0, 1			# t0 += 1
+    	sw t0, 8(s1)			# timeOutBoa = t0
+    	bnez t0, muller			# if t0 != 0, pula pra muller
+    	li t1, 144			
+    	li t2, 96
+    	li t3, 1
+    	sw t1, 0(s1)			# posXBoa = 144
+    	sw t2, 4(s1)			# posYBoa = 96
+    	sw t3, 12(s1)			# runningStateBoa = 1 (left)
+dontStartBoa:
+    	mv a0, s4
+    	lw a1, 0(s1)
+    	lw a2, 4(s1)
+    	call print			# printa Boateng
+    		
+    	lw t0, 0(s11)			# t0 = posXFuleco			
+    	lw t1, 4(s11)			# t1 = posYFuleco
+    	sub t0, t0, a1			# t0 = posXFul - poxXBoa
+    	sub t1, t1, a2			# t1 = posYFul - posYBoa
+
+    	
+    	mv a0, s8			# a0 = collisionMap
+    	
+    	sw t3, 12(s1)
+    	bgez t0, boaWantsRight		# x < 0 (quer ir pra esquerda)
+    	li t4, 1
+    	beq t3, t1, boaIsToRight	# se tiver indo pra direita, pula pra boaIsToRight
+    	li a4, 1			# a4 = 01
+    	slli a4, a4, 2			# a4 = 00.00.01.00 ( esquerda, -, direita, - )
+    	j boaWantsUp
+boaIsToRight:				# x >= 0 && runningState == 1 (ta indo pra direita e quer ir pra esquerda)
+	li a4, 1			# a4 = 01
+    	slli a4, a4, 6			# a4 = 01.00.00.00 ( direita, -, esquerda, - )	
+    	j boaWantsUp
+	
+boaWantsRight:				# x >= 0 ( quer ir pra direita)
+	beqz t3, boaIsToLeft		# se tiver indo pra esquerda, pula pra boaIsToLeft	
+	li a4, 1			# a4 = 01
+	slli a4, a4, 6			# a4 = 01.00.00.00 ( direita, -, esquerda, -)
+	j boaWantsUp
+boaIsToLeft:				# se tiver indo pra esquerda e quer ir pra direita
+    	li a4, 1			# a4 = 1
+    	slli a4, a4, 2			# a4 = 00.00.01.00 ( esquerda, -, direita, - )
+    	
+boaWantsUp:
+	bgez t1, boaWantsDown		# y < 0 (quer ir pra cima)
+	li t4, 3
+	beq t3, t4, boaIsToDown		# se tiver indo pra baixo, pula pra boaIstoDown
+	li t5, 3			# t5 = 11
+	slli t5, t5, 4			# t5 = 00.11.00.00
+	addi t5, t5, 2			# t5 = 00.11.00.10
+	add a4, a4, t5			# a4 = xx.11.xx.10 ( -, cima, -, baixo)
+	j moveBoa
+boaIsToDown:				# se tiver indo pra baixo e quer ir pra cima
+	li t5, 2			# t5 = 10
+	slli t5, t5, 4			# t5 = 00.10.00.00
+	addi t5, t5, 3			# t5 = 00.10.00.11
+	add a4, a4, t5			# a4 = xx.10.xx.11 ( -, baixo, -, cima )
+	j moveBoa
+
+boaWantsDown: 				# y >= 0 (quer ir pra baixo)
+	li t4, 4
+	beq t3, t4, boaIsToUp
+	li t5, 2			# t5 = 10
+	slli t5, t5, 4			# t5 = 00.10.00.00
+	addi t5, t5, 3			# t5 = 00.10.00.11
+	add a4, a4, t5			# a4 = xx.10.xx.11 ( -, baixo, -, cima )
+	j moveBoa
+boaIsToUp:				# ta indo pra cima e quer ir pra baixo
+	li t5, 3			# t5 = 11
+	slli t5, t5, 4			# t5 = 00.11.00.00
+	addi t5, t5, 2			# t5 = 00.11.00.10
+	add a4, a4, t5			# a4 = xx.11.xx.10 ( -, cima, -, baixo)
+
+moveBoa:
+	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
+	
+	mv a0, t0
+	li a7, 1
+	ecall
+	la a0, space
+	li a7, 4
+	ecall
+	
+	mv a0, s8			# a0 = collisionMap
+	
+	bnez t0, moveBoaRight		# t0 == 0
+	addi a1, a1, -4			# update temporario da posicao para 4 pixels para esquerda
+	call checkCollision		# check da colisao superior esquerda
+	li t0, 0			# t0 = 0
+	addi a1, a1, 4			# cancela o update temporario do eixo X
+	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
+	
+	addi a1, a1, -4			# update da posicao para 4 pixels para esquerda
+	addi a2, a2, 15			# update da posicao para 15 pixels para baixo
+	call checkCollision		# check da colisao inferior esquerda
+	li t0, 0			# t0 = 0
+	addi a1, a1, 4			# cancela o update temporario do eixo X
+	addi a2, a2, -15		# cancela o update temporario do eixo Y
+	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
+	
+	addi a1, a1, -4			# update da posicao para 4 pixels para a esquerda
+	
+	slli t1, t0, 6
+	sub a4, a4, t1
+	slli a4, a4, 2			# a4 = xx.xx.xx.00
+	j boaHasMoved
+	
+moveBoaRight:
+	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
+	li t1, 1
+	bne t0, t1, moveBoaUp		# t0 == 1
+	
+	addi a1, a1, 16			# update temporario do eixo X para a direita 
+	call checkCollision		# check de colisao superior direita
+	addi a1, a1, -16		# cancela o update temporario do eixo X para a direita
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
+	
+	addi a1, a1, 16			# update temporario do eixo X para a diereita
+	addi a2, a2, 15			# update temporario do eixo Y para baixo
+	call checkCollision		# check de colisao inferior direita
+	addi a1, a1, -16		# cancela o update temporario do eixo X para a direita
+	addi a2, a2, -15		# cancela o update temporario do eixo Y para a esquerda
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
+	
+	addi a1, a1, 4			# update da posicao para 4 pixels para a direita
+	
+	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
+	slli t1, t0, 6
+	sub a4, a4, t1
+	slli a4, a4, 2			# a4 = xx.xx.xx.00
+	j boaHasMoved
+	
+moveBoaUp:
+	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
+	
+	
+	li t1, 2
+	bne t0, t1, moveBoaDown		# t0 == 2
+	
+	addi a2, a2, -4			# update temporario do eixo Y para cima
+	call checkCollision		# check de colisao superior equerda
+	addi a2, a2, 4			# cancela o update temporario do eixo Y
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
+	
+	addi a2, a2, -4			# update temporario do eixo Y para cima
+	addi a1, a1, 12			# update temporario do eixo X para direita
+	call checkCollision		# check de colisao superior direito
+	addi a2, a2, 4			# cancela update temporario do eixo Y para cima
+	addi a1, a1, -12		# cancela update temporario do eixo X para direita
+	li t0, 0			# t0 = 0
+	beq t0, t1, moveBoa		# se ha colisao, pula para "moveBoa"
+	
+	addi a2, a2, -4			# update da posicao para 4 pixels para a cima
+	
+	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
+	slli t1, t0, 6
+	sub a4, a4, t1
+	slli a4, a4, 2			# a4 = xx.xx.xx.00
+	j boaHasMoved
+	
+moveBoaDown:
+	addi a2, a2, 16			# update temporario do eixo Y para baixo
+	call checkCollision		# check de colisao inferior equerda
+	addi a2, a2, -16		# cancela o update temporario do eixo Y
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
+	
+	addi a2, a2, 16			# update temporario do eixo Y para baixo
+	addi a1, a1, 12			# update temporario do eixo X para direita
+	call checkCollision		# check de colisao superior direito
+	addi a2, a2, -16		# cancela o update temporario do eixo Y 
+	addi a1, a1, -12		# cancela o update temporario do eixo X
+	li t0, 0			# t0 = 0
+	beq t0, t1, moveBoa		# se ha colisao, pula para "moveBoa"
+	
+	addi a2, a2, 4			# update da posicao para 4 pixels para a baixo
+	
+	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
+	slli t1, t0, 6
+	sub a4, a4, t1
+	slli a4, a4, 2			# a4 = xx.xx.xx.00
+	j boaHasMoved
+
+
+boaHasMoved:
+	la a0, ae
+	li a7, 4
+	ecall
+	
+	sw a1, 0(s1)
+    	sw a2, 4(s1)
+muller:	
+	
+    	
+    	
 
 
 	li a0,76			# pausa de 76m segundos
@@ -346,7 +562,10 @@ endGame:
 
 .data
 fulecoInfo: .word 144, 176, 0, 0, 0, 1, 0	# posX, posY, runningState, points, superState, frameAnimacao, leftOrRight
+germanyInfo: .word 114, 128, -130, 0, 0	 	#posXBoa, posYBoa, timeOutBoa, runningStateBoa, leftorRightBoa		#134, 128, 154, 128, 174, 128
 space: .string " "
+ae: .string "a\n"
+be: .string "b\n"
 .include "sprites/props/arquivos .data/dot.data"
 .include "sprites/props/arquivos .data/brazuca.data"
  
