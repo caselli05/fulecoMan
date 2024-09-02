@@ -305,13 +305,31 @@ dontChangeFrameAnimacao:
 	beq t0, t1, endGame		# se pontos == 115, acaba a run
 	
 dontAddPoints:
-	li t1, 192
-	bne t1, t2, dontBeSuper
-	li t1, 17
-	sw t1, 8(t0)
+	li t1, 192			# t1 = 192
+	bne t1, t2, dontBeSuper		# se t1 != t2, pula pra dontBeSuper
+	li t1, 17			# t1 = 17
+	sw t1, 8(t0)			# guarda 17 no endereco da brazuca recem pegada
 	# trocar o estado de superfuleco
-	
+	lw t1, 16(s11)			# t1 = superState
+	bne t1, zero, dontChangeSuperSprite	# sw t1 != 0, pula pra dontChangeSuperState
+	li t0, 1056			# t0 = 1056
+	add s10, s10, t0		# s10 += 1056
+dontChangeSuperSprite:
+	li t1, 132			# t1 = 132
+	sw t1, 16(s11)			# superState = 132
 dontBeSuper:
+	lw t0, 16(s11)			# t0 = superState
+	beqz t0, isNotSuper		# se t0 == 0, pula pra isNotSuper
+	
+	addi t0, t0, -1			# t0 -= 1
+	sw t0, 16(s11)			# superState = t0
+	bnez t0, isNotSuper		# se t0 == 0, pula pra isNotSuper
+	li t0, 1056			# t0 = 1056
+	sub s10, s10, t0		# s10 -= 1056
+		
+isNotSuper:
+
+
 	li a0,76			# pausa de 76m segundos
 	li a7,32
 	ecall
