@@ -260,7 +260,7 @@ dontTeleportLeft:
 	li t1, 300			# t1 = 300
 	bne a1, t1, dontTeleportRight	# se posX != 300, pula pra "dontTeleportRight"
 	li t1, 64			# t1 = 64
-	bne a2, t1, dontTeleportLeft	# se posY != 64, pula pra "dontTeleportRight"
+	bne a2, t1, dontTeleportRight	# se posY != 64, pula pra "dontTeleportRight"
 	li t1, 1			# t1 = 1
 	lw t0, 8(s11)
 	beq t0, t1, dontTeleportRight	# se movState == left, pula pra "dontTeleportRight"
@@ -288,7 +288,8 @@ dontTeleportDown:
 	lw t0, 20(s11)			# t0 = frameAnimacao
 	li t1, 264			# t1 = 264
 	mul t1, t1, t0			# t0 = +/- 264
-	add s10, s10, t1		# muda o sprite para ser animado
+	add s10, s10, t1		# muda o sprite do Fuleco para ser animado
+	add s4, s4, t1			# muda o sprite do Boateng pra ser animado
 	li t1, -1			# t1= -1
 	mul t0, t0, t1			# t0 *= -1
 	sw t0, 20(s11)			# guarda t0 em frameAnimacao
@@ -364,7 +365,7 @@ dontStartBoa:
     	lw t0, 0(s11)			# t0 = posXFuleco			
     	lw t1, 4(s11)			# t1 = posYFuleco
     	sub t0, t0, a1			# t0 = posXFul - poxXBoa
-    	sub t1, t1, a2			# t1 = posYFul - posYBoa
+    	sub t2, t1, a2			# t1 = posYFul - posYBoa
 
     	
     	mv a0, s8			# a0 = collisionMap
@@ -387,20 +388,20 @@ boaXZero:
 		bltz t2, boaXZeroLeftUp
 		bgtz t2, boaXZeroLeftDown
 		boaXZeroLeftUp:
-			li a4, 177
+			li a4, 141
 			j moveBoa
 		boaXZeroLeftDown:
-			li a4, 225
+			li a4, 201
 			j moveBoa
 	boaXZeroRight:
 		beqz t2, boaTouch
 		bltz t2, boaXZeroRightUp
 		bgtz t2, boaXZeroRightDown
 		boaXZeroRightUp:
-			li a4, 180
+			li a4, 156
 			j moveBoa
 		boaXZeroRightDown:
-			li a4, 228
+			li a4, 216
 			j moveBoa
 	boaXZeroUp:
 		beqz t2, boaTouch
@@ -421,16 +422,16 @@ boaXGreater:
 		bgez t2, boaXGreaterLeftDown
 		bltz t2, boaXGreaterLeftUp
 		boaXGreaterLeftDown:
-			li a4, 177
+			li a4, 201
 			j moveBoa
 		boaXGreaterLeftUp:
-			li a4, 225
+			li a4, 141
 			j moveBoa
 	boaXGreaterRight:
 		bgez t2, boaXGreaterRightDown
 		bltz t2, boaXGreaterRightUp
 		boaXGreaterRightDown:
-			li a4, 108
+			li a4, 114
 			j moveBoa
 		boaXGreaterRightUp:
 			li a4, 120
@@ -458,19 +459,19 @@ boaYLess:
 			li a4, 45
 			j moveBoa
 	boaYLessRight:
-		beqz t2, boaYLessRightDown
+		bgez t2, boaYLessRightDown
 		j boaYLessRightUp
 		boaYLessRightDown:
-			li a4, 228
+			li a4, 220
 			j moveBoa
 		boaYLessRightUp:
-			li a4, 180
+			li a4, 156
 			j moveBoa
 	boaYLessUp:
-		li a4, 27
+		li a4, 39
 		j moveBoa
 	boaYLessDown:
-		li a4, 30
+		li a4, 54
 		j moveBoa
 boaTouch:
 	#tira vida
@@ -480,13 +481,6 @@ moveBoa:
 	slli t1, t0, 6
 	sub a4, a4, t1
 	slli a4, a4, 2			# a4 = xx.xx.xx.00
-	
-	mv a0, t0
-	li a7, 1
-	ecall
-	la a0, space
-	li a7, 4
-	ecall
 	
 	mv a0, s8			# a0 = collisionMap
 	
@@ -505,7 +499,18 @@ moveBoa:
 	addi a2, a2, -15		# cancela o update temporario do eixo Y
 	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
 	
+	li t0, 0
+	sw t0, 12(s1)
+	
 	addi a1, a1, -4			# update da posicao para 4 pixels para a esquerda
+	
+	li t1, 0			# t1 = 0
+	bne a1, t1, dontTeleportLeftBoa	# se posX != 0, pula pra "dontTeleportLeftBoa"
+	li t1, 0			# t1 = 0
+	lw t0, 12(s1)
+	bne t0, t1, dontTeleportLeftBoa	# se movState == right, pula pra "dontTeleportLeftBoa" 
+	li a1, 288			# usa o teleporte da esquerda
+	dontTeleportLeftBoa:
 	j boaHasMoved
 	
 moveBoaRight:
@@ -526,7 +531,18 @@ moveBoaRight:
 	li t0, 0			# t0 = 0
 	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
 	
+	li t0, 1
+	sw t0, 12(s1)
+	
 	addi a1, a1, 4			# update da posicao para 4 pixels para a direita
+	
+	li t1, 300			# t1 = 300
+	bne a1, t1, dontTeleportRightBoa# se posX != 300, pula pra "dontTeleportRightBoa"
+	li t1, 1
+	lw t0, 12(s1)
+	bne t0, t1, dontTeleportRightBoa# se movState == left, pula pra "dontTeleportRightBoa"
+	li a1, 0			# usa o teleporte da direita
+	dontTeleportRightBoa:
 	j boaHasMoved
 	
 moveBoaUp:
@@ -547,7 +563,15 @@ moveBoaUp:
 	li t0, 0			# t0 = 0
 	beq t0, t1, moveBoa		# se ha colisao, pula para "moveBoa"
 	
+	li t0, 2
+	sw t0, 12(s1)
+	
 	addi a2, a2, -4			# update da posicao para 4 pixels para a cima
+	
+	li t1, 12
+	bge a2, t1, dontTeleportUpBoa
+	li a2, 228
+	dontTeleportUpBoa:
 	j boaHasMoved
 	
 moveBoaDown:
@@ -565,11 +589,15 @@ moveBoaDown:
 	li t0, 0			# t0 = 0
 	beq t0, t1, moveBoa		# se ha colisao, pula para "moveBoa"
 	
-	la a0, be
-	li a7, 4
-	ecall
+	li t0, 3
+	sw t0, 12(s1)
 	
 	addi a2, a2, 4			# update da posicao para 4 pixels para a baixo
+	
+	li t1, 228
+	bne a2, t1, dontTeleportDownBoa
+	li a2, 12 
+	dontTeleportDownBoa:
 	j boaHasMoved
 
 

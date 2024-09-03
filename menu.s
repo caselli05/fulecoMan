@@ -93,6 +93,7 @@ gameOneStart:
 	
 gameTwoStart:
     # setup dos sprites
+    	la s4, fixedBoateng0
 	la s8, map2Collision
 	la s9, map2
 	la s10, fulecoLeft0
@@ -130,10 +131,10 @@ NOTAS: 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 5
 .include "sprites/fuleco/arquivos .data/fulecoBallRight0.data"		# inclui o .data com o Fuleco Ball Right 0
 .include "sprites/fuleco/arquivos .data/fulecoBallRight1.data"		# inclui o .data com o Fuleco Ball Right 1
     # Sprites do Boateng
-.include "sprites/alemanha/arquivos .data/BoatengLeft0.data"
-.include "sprites/alemanha/arquivos .data/BoatengLeft1.data"
-.include "sprites/alemanha/arquivos .data/BoatengRight0.data"
-.include "sprites/alemanha/arquivos .data/BoatengRight1.data"
+.include "sprites/alemanha/arquivos .data/BoatengLeft0.data"		# inclui o .data com o Boateng Left 0
+.include "sprites/alemanha/arquivos .data/BoatengLeft1.data"		# inclui o .data com o Boateng Left 1
+.include "sprites/alemanha/arquivos .data/BoatengRight0.data"		# inclui o .data com o Boateng Right 0
+.include "sprites/alemanha/arquivos .data/BoatengRight1.data"		# inclui o .data com o Boateng Right 1
 
 
 
