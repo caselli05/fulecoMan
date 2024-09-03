@@ -47,7 +47,7 @@ main:
 	
 	li a3, 0
 loopgame:
-	xori a3, a3, 1			# change frame 0 <--> 1
+	li a3, 0
     # print map
     	mv a0, s9
     	li a1, 0
@@ -343,11 +343,14 @@ dontBeSuper:
 		
 isNotSuper:
     # Boateng
+    	lw a1, 0(s1)
+    	lw a2, 4(s1)
+    	
     	lw t0, 8(s1)			# t0 = timeOutBoateng
     	bgtz t0, dontStartBoa		# if t0 > 0, pula pra dontStartBoa
     	addi t0, t0, 1			# t0 += 1
     	sw t0, 8(s1)			# timeOutBoa = t0
-    	bnez t0, muller			# if t0 != 0, pula pra muller
+    	bnez t0, boaHasMoved		# if t0 != 0, pula pra boaHasMoved
     	li t1, 144			
     	li t2, 96
     	li t3, 1
@@ -355,10 +358,8 @@ isNotSuper:
     	sw t2, 4(s1)			# posYBoa = 96
     	sw t3, 12(s1)			# runningStateBoa = 1 (left)
 dontStartBoa:
-    	mv a0, s4
     	lw a1, 0(s1)
     	lw a2, 4(s1)
-    	call print			# printa Boateng
     		
     	lw t0, 0(s11)			# t0 = posXFuleco			
     	lw t1, 4(s11)			# t1 = posYFuleco
@@ -368,59 +369,117 @@ dontStartBoa:
     	
     	mv a0, s8			# a0 = collisionMap
     	
-    	sw t3, 12(s1)
-    	bgez t0, boaWantsRight		# x < 0 (quer ir pra esquerda)
-    	li t4, 1
-    	beq t3, t1, boaIsToRight	# se tiver indo pra direita, pula pra boaIsToRight
-    	li a4, 1			# a4 = 01
-    	slli a4, a4, 2			# a4 = 00.00.01.00 ( esquerda, -, direita, - )
-    	j boaWantsUp
-boaIsToRight:				# x >= 0 && runningState == 1 (ta indo pra direita e quer ir pra esquerda)
-	li a4, 1			# a4 = 01
-    	slli a4, a4, 6			# a4 = 01.00.00.00 ( direita, -, esquerda, - )	
-    	j boaWantsUp
-	
-boaWantsRight:				# x >= 0 ( quer ir pra direita)
-	beqz t3, boaIsToLeft		# se tiver indo pra esquerda, pula pra boaIsToLeft	
-	li a4, 1			# a4 = 01
-	slli a4, a4, 6			# a4 = 01.00.00.00 ( direita, -, esquerda, -)
-	j boaWantsUp
-boaIsToLeft:				# se tiver indo pra esquerda e quer ir pra direita
-    	li a4, 1			# a4 = 1
-    	slli a4, a4, 2			# a4 = 00.00.01.00 ( esquerda, -, direita, - )
+    	lw t3, 12(s1)
     	
-boaWantsUp:
-	bgez t1, boaWantsDown		# y < 0 (quer ir pra cima)
-	li t4, 3
-	beq t3, t4, boaIsToDown		# se tiver indo pra baixo, pula pra boaIstoDown
-	li t5, 3			# t5 = 11
-	slli t5, t5, 4			# t5 = 00.11.00.00
-	addi t5, t5, 2			# t5 = 00.11.00.10
-	add a4, a4, t5			# a4 = xx.11.xx.10 ( -, cima, -, baixo)
-	j moveBoa
-boaIsToDown:				# se tiver indo pra baixo e quer ir pra cima
-	li t5, 2			# t5 = 10
-	slli t5, t5, 4			# t5 = 00.10.00.00
-	addi t5, t5, 3			# t5 = 00.10.00.11
-	add a4, a4, t5			# a4 = xx.10.xx.11 ( -, baixo, -, cima )
-	j moveBoa
-
-boaWantsDown: 				# y >= 0 (quer ir pra baixo)
-	li t4, 4
-	beq t3, t4, boaIsToUp
-	li t5, 2			# t5 = 10
-	slli t5, t5, 4			# t5 = 00.10.00.00
-	addi t5, t5, 3			# t5 = 00.10.00.11
-	add a4, a4, t5			# a4 = xx.10.xx.11 ( -, baixo, -, cima )
-	j moveBoa
-boaIsToUp:				# ta indo pra cima e quer ir pra baixo
-	li t5, 3			# t5 = 11
-	slli t5, t5, 4			# t5 = 00.11.00.00
-	addi t5, t5, 2			# t5 = 00.11.00.10
-	add a4, a4, t5			# a4 = xx.11.xx.10 ( -, cima, -, baixo)
-
+	beqz t0, boaXZero
+	bgtz t0, boaXGreater
+	bltz t0, boaYLess
+	
+boaXZero:
+	beqz t3, boaXZeroLeft
+	addi t3, t3, -1
+	beqz t3, boaXZeroRight
+	addi t3, t3, -1
+	beqz t3, boaXZeroUp
+	j boaXZeroDown
+	boaXZeroLeft:
+		beqz t2, boaTouch
+		bltz t2, boaXZeroLeftUp
+		bgtz t2, boaXZeroLeftDown
+		boaXZeroLeftUp:
+			li a4, 177
+			j moveBoa
+		boaXZeroLeftDown:
+			li a4, 225
+			j moveBoa
+	boaXZeroRight:
+		beqz t2, boaTouch
+		bltz t2, boaXZeroRightUp
+		bgtz t2, boaXZeroRightDown
+		boaXZeroRightUp:
+			li a4, 180
+			j moveBoa
+		boaXZeroRightDown:
+			li a4, 228
+			j moveBoa
+	boaXZeroUp:
+		beqz t2, boaTouch
+		li a4, 135
+		j moveBoa
+	 boaXZeroDown:
+	 	beqz t2, boaTouch
+	 	li a4, 198
+	 	j moveBoa
+boaXGreater:
+	beqz t3, boaXGreaterLeft
+	addi t3, t3, -1
+	beqz t3, boaXGreaterRight
+	addi t3, t3, -1
+	beqz t3, boaXGreaterUp
+	j boaXGreaterDown
+	boaXGreaterLeft:
+		bgez t2, boaXGreaterLeftDown
+		bltz t2, boaXGreaterLeftUp
+		boaXGreaterLeftDown:
+			li a4, 177
+			j moveBoa
+		boaXGreaterLeftUp:
+			li a4, 225
+			j moveBoa
+	boaXGreaterRight:
+		bgez t2, boaXGreaterRightDown
+		bltz t2, boaXGreaterRightUp
+		boaXGreaterRightDown:
+			li a4, 108
+			j moveBoa
+		boaXGreaterRightUp:
+			li a4, 120
+			j moveBoa
+	boaXGreaterUp:
+		li a4, 75
+		j moveBoa
+	boaXGreaterDown:
+		li a4, 78
+		j moveBoa
+boaYLess:
+	beqz t3, boaYLessLeft
+	addi t3, t3, -1
+	beqz t3, boaYLessRight
+	addi t3, t3, -1
+	beqz t3, boaYLessUp
+	j boaYLessDown
+	boaYLessLeft:
+		bgez t2, boaYLessLeftDown
+		j boaYLessLeftUp
+		boaYLessLeftDown:
+			li a4, 57
+			j moveBoa
+		boaYLessLeftUp:
+			li a4, 45
+			j moveBoa
+	boaYLessRight:
+		beqz t2, boaYLessRightDown
+		j boaYLessRightUp
+		boaYLessRightDown:
+			li a4, 228
+			j moveBoa
+		boaYLessRightUp:
+			li a4, 180
+			j moveBoa
+	boaYLessUp:
+		li a4, 27
+		j moveBoa
+	boaYLessDown:
+		li a4, 30
+		j moveBoa
+boaTouch:
+	#tira vida
+		
 moveBoa:
 	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
+	slli t1, t0, 6
+	sub a4, a4, t1
+	slli a4, a4, 2			# a4 = xx.xx.xx.00
 	
 	mv a0, t0
 	li a7, 1
@@ -447,14 +506,9 @@ moveBoa:
 	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
 	
 	addi a1, a1, -4			# update da posicao para 4 pixels para a esquerda
-	
-	slli t1, t0, 6
-	sub a4, a4, t1
-	slli a4, a4, 2			# a4 = xx.xx.xx.00
 	j boaHasMoved
 	
 moveBoaRight:
-	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
 	li t1, 1
 	bne t0, t1, moveBoaUp		# t0 == 1
 	
@@ -473,17 +527,9 @@ moveBoaRight:
 	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
 	
 	addi a1, a1, 4			# update da posicao para 4 pixels para a direita
-	
-	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
-	slli t1, t0, 6
-	sub a4, a4, t1
-	slli a4, a4, 2			# a4 = xx.xx.xx.00
 	j boaHasMoved
 	
 moveBoaUp:
-	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
-	
-	
 	li t1, 2
 	bne t0, t1, moveBoaDown		# t0 == 2
 	
@@ -502,11 +548,6 @@ moveBoaUp:
 	beq t0, t1, moveBoa		# se ha colisao, pula para "moveBoa"
 	
 	addi a2, a2, -4			# update da posicao para 4 pixels para a cima
-	
-	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
-	slli t1, t0, 6
-	sub a4, a4, t1
-	slli a4, a4, 2			# a4 = xx.xx.xx.00
 	j boaHasMoved
 	
 moveBoaDown:
@@ -524,12 +565,11 @@ moveBoaDown:
 	li t0, 0			# t0 = 0
 	beq t0, t1, moveBoa		# se ha colisao, pula para "moveBoa"
 	
-	addi a2, a2, 4			# update da posicao para 4 pixels para a baixo
+	la a0, be
+	li a7, 4
+	ecall
 	
-	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
-	slli t1, t0, 6
-	sub a4, a4, t1
-	slli a4, a4, 2			# a4 = xx.xx.xx.00
+	addi a2, a2, 4			# update da posicao para 4 pixels para a baixo
 	j boaHasMoved
 
 
@@ -538,8 +578,11 @@ boaHasMoved:
 	li a7, 4
 	ecall
 	
+	mv a0, s4
 	sw a1, 0(s1)
     	sw a2, 4(s1)
+    	call print
+    	
 muller:	
 	
     	
