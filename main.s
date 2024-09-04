@@ -357,6 +357,7 @@ isNotSuper:
     	sw t1, 0(s1)			# posXBoa = 144
     	sw t2, 4(s1)			# posYBoa = 96
     	sw t3, 12(s1)			# runningStateBoa = 1 (left)
+    	sw t3, 16(s1)			# frameBoaAnimacao = 1
 dontStartBoa:
     	lw a1, 0(s1)
     	lw a2, 4(s1)
@@ -533,16 +534,25 @@ boaXLess:	# x < 0 (esquerda)
 			li a4, 54	# a4 = 00.11.01.10 ( esquerda, baixo, direita, cima )
 			j moveBoa
 boaTouch:
-	#tira vida
 	lw t0, 16(s11)
 	
 	beqz t0, boaKillFuleco
-		#la s4, fixedBoateng0	# superState > 0
-		li a1, 114
-		li a2, 128
+		li a1, 114			# posBoaX = 114
+		li a2, 128			# posYBoa = 128
 		li t1, -131
-		sw t1, 8(s1)
+		sw t1, 8(s1)			# boaTimeout = -131
+		li t0, 0
+		lw t1, 20(s1)			# t1 = boaLeftOrRight
+		beq t0, t1, boaIsDeadAndLeft	
+		addi s4, s4, -528		# s4 -= 528, se tiver pra direita 
+		boaIsDeadAndLeft:
+		lw t1, 16(s1)			# t1 = frameBoa
+		beq t1, t0, boaIsDeadAndFrame0
+		addi s4, s4, -264		# s4 -= 264, se tiver no frame 1
+		sw zero, 16(s1)			# frameBoa = 0
+		boaIsDeadAndFrame0:
 		j boaHasMoved
+
 	boaKillFuleco:			# superState == 0
 		addi s0, s0, -1
 		bgtz s0, restartGame  
@@ -573,6 +583,11 @@ moveBoa:
 	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
 	
 	li t0, 0
+	lw t1, 20(s1)
+	beq t0, t1, boaIsLeft
+	addi s4, s4, -528
+	sw t0, 20(s1)
+	boaIsLeft:
 	sw t0, 12(s1)
 	
 	addi a1, a1, -4			# update da posicao para 4 pixels para a esquerda
@@ -605,6 +620,11 @@ moveBoaRight:
 	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
 	
 	li t0, 1
+	lw t1, 20(s1)
+	beq t0, t1, boaIsRight
+	addi s4, s4, 528
+	sw t0, 20(s1)
+	boaIsRight:
 	sw t0, 12(s1)
 	
 	addi a1, a1, 4			# update da posicao para 4 pixels para a direita
@@ -679,14 +699,25 @@ boaHasMoved:
     	
     	lw t1, 0(s11)
     	lw t2, 4(s11)
+    	
+    	lw t3, 8(s1)
+    	bltz t3, muller
   	
-    	blt a1, t1, muller  	
+    	blt a1, t1, boaDontTouch  	
     	addi t1, t1, 15	
-    	bgt a1, t1, muller
-    	blt a2, t2, muller	
+    	bgt a1, t1, boaDontTouch
+    	blt a2, t2, boaDontTouch	
     	addi t2, t2, 15
-    	bgt a2, t2, muller
+    	bgt a2, t2, boaDontTouch
     	j boaTouch
+    	boaDontTouch:
+		lw t0, 16(s1)			# t0 = frameBoaAnimacao
+		li t1, 264			# t1 = 264
+		mul t1, t1, t0			# t0 = +/- 264
+		add s4, s4, t1			# muda o sprite do Boateng para ser animado
+		li t1, -1			# t1= -1
+		mul t0, t0, t1			# t0 *= -1
+		sw t0, 16(s1)			# guarda t0 em frameBoaAnimacao
 
 muller:	
 
