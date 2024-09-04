@@ -234,7 +234,7 @@ goDown:
 	
 	addi a2, a2, 16			# update temporario do eixo Y para baixo
 	call checkCollision		# check de colisao inferior equerda
-	addi a2, a2, -16			# cancela o update temporario do eixo Y
+	addi a2, a2, -16		# cancela o update temporario do eixo Y
 	li t0, 0			# t0 = 0
 	beq t1, t0, pass		# se ha colisao, pula para "pass"
 	
@@ -289,7 +289,6 @@ dontTeleportDown:
 	li t1, 264			# t1 = 264
 	mul t1, t1, t0			# t0 = +/- 264
 	add s10, s10, t1		# muda o sprite do Fuleco para ser animado
-	add s4, s4, t1			# muda o sprite do Boateng pra ser animado
 	li t1, -1			# t1= -1
 	mul t0, t0, t1			# t0 *= -1
 	sw t0, 20(s11)			# guarda t0 em frameAnimacao
@@ -370,11 +369,34 @@ dontStartBoa:
     	mv a0, s8			# a0 = collisionMap
     	
     	lw t3, 12(s1)			# t3 = runningStateBoateng
+    	
+    	lw t4, 16(s11)
 	
+	bnez t4, boaIsAfraid
 	beqz t0, boaXZero
 	bgtz t0, boaXGreater
 	bltz t0, boaXLess
 	
+boaIsAfraid:
+	beqz t3, boaIsAfraidLeft		
+	addi t3, t3, -1
+	beqz t3, boaIsAfraidRight
+	addi t3, t3, -1
+	beqz t3, boaIsAfraidUp
+	j boaIsAfraidDown
+	boaIsAfraidLeft:
+		li a4, 113 		# a4 = 01.11.00.01 ( cima, baixo, esquerda, direita )
+		j moveBoa
+	boaIsAfraidRight:	
+		li a4, 228 		# a4 = 11.10.01.00 ( baixo, cima, direita, esquerda )
+		j moveBoa
+	boaIsAfraidUp:
+		li a4, 75 		# a4 = 01.00.10.11 ( direita, esquerda, cima, baixo )
+		j moveBoa
+	boaIsAfraidDown:
+		li a4, 30		# a4 = 00.01.11.10 ( esquerda, direita, baixo, cima )
+		j moveBoa
+		
 boaXZero:	# x == 0
 	beqz t3, boaXZeroLeft		
 	addi t3, t3, -1
@@ -405,7 +427,7 @@ boaXZero:	# x == 0
 	boaXZeroUp:		# t3 == 2
 		beqz t2, boaTouch	# se y == 0, pula pra boaTouch
 		bltz t2,boaXZeroUpUp
-		bgtz t2, boaXZeroUp
+		bgtz t2, boaXZeroUpDown
 		boaXZeroUpUp:	# y < 0
 			li a4, 147	# a4 = 10.01.00.11 ( cima, diretia, esquerda, baixo )
 			j moveBoa
@@ -416,11 +438,11 @@ boaXZero:	# x == 0
 	 	beqz t2, boaTouch	# se y == 0, pula pra boaTouch
 	 	bltz t2, boaXZeroDownUp
 	 	bgtz t2, boaXZeroDownDown
-	 	boaXZeroDownUp:
-	 		li a4, 75		# a4 = 01.00.10.11 ( direita, esquerda, cima, baixo )
-	 		j moveBoa
-	 	boaXZeroDownDown:
-	 		li a4, 198		# a4 = 11.00.01.10 ( baixo, esquerda, direita, cima )
+	 	boaXZeroDownUp:	# y < 0
+	 		li a4, 78	# a4 = 01.00.11.10 ( direita, esquerda, baixo, cima )
+	 		j moveBoa	
+	 	boaXZeroDownDown:# y >= 0
+	 		li a4, 198	# a4 = 11.00.01.10 ( baixo, esquerda, direita, cima )
 	 		j moveBoa
 boaXGreater:	# x > 0 ( direita )
 	beqz t3, boaXGreaterLeft
@@ -512,10 +534,20 @@ boaXLess:	# x < 0 (esquerda)
 			j moveBoa
 boaTouch:
 	#tira vida
-	addi s0, s0, -1
-	bgtz s0, restartGame  
-	li a7, 10
-	ecall
+	lw t0, 16(s11)
+	
+	beqz t0, boaKillFuleco
+		#la s4, fixedBoateng0	# superState > 0
+		li a1, 114
+		li a2, 128
+		li t1, -131
+		sw t1, 8(s1)
+		j boaHasMoved
+	boaKillFuleco:			# superState == 0
+		addi s0, s0, -1
+		bgtz s0, restartGame  
+		li a7, 10
+		ecall
 		
 moveBoa:
 	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
@@ -644,6 +676,17 @@ boaHasMoved:
 	sw a1, 0(s1)
     	sw a2, 4(s1)
     	call print
+    	
+    	lw t1, 0(s11)
+    	lw t2, 4(s11)
+  	
+    	blt a1, t1, muller  	
+    	addi t1, t1, 15	
+    	bgt a1, t1, muller
+    	blt a2, t2, muller	
+    	addi t2, t2, 15
+    	bgt a2, t2, muller
+    	j boaTouch
 
 muller:	
 
@@ -672,6 +715,7 @@ space: .string " "
 ae: .string "a\n"
 be: .string "b\n"
 ce: .string "c\n"
+de: .string "b\n"
 .include "sprites/props/arquivos .data/dot.data"
 .include "sprites/props/arquivos .data/brazuca.data"
  
