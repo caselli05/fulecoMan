@@ -266,19 +266,19 @@ dontTeleportLeft:
 	beq t0, t1, dontTeleportRight	# se movState == left, pula pra "dontTeleportRight"
 	li a1, 0			# usa o teleporte da direita
 dontTeleportRight:
-	li t1, 12
-	bge a2, t1, dontTeleportUp
+	li t1, 12			
+	bge a2, t1, dontTeleportUp	# se posY > 12, pula pra dontTeleportUp
 	li t1, 4
-	lw t0, 8(s11)
-	beq t0, t1, dontTeleportUp
-	li a2, 228
+	lw t0, 8(s11)			# t0 = runningState
+	beq t0, t1, dontTeleportUp	# se runningState == 4, pula pra dontTeleportUp
+	li a2, 228			# usa o teleporte de cima
 dontTeleportUp:
 	li t1, 228
-	bne a2, t1, dontTeleportDown
-	li t1, 3
-	lw t0, 8(s11)
-	beq t0, t1, dontTeleportDown
-	li a2, 12 
+	bne a2, t1, dontTeleportDown	# se posY != 288, pula pra dontTeleportDown
+	li t1, 3	
+	lw t0, 8(s11)			# t0 = runningState
+	beq t0, t1, dontTeleportDown	# se runningState == 3, pula pra dontTeleportDown
+	li a2, 12 			# usa o teleporte de baixo
 dontTeleportDown:
 	li t0, 1			# t0 = 1
 	beq t0, a3, dontChangeFrameAnimacao
@@ -367,121 +367,162 @@ dontStartBoa:
     	sub t0, t0, a1			# t0 = posXFul - poxXBoa
     	sub t2, t1, a2			# t1 = posYFul - posYBoa
 
-    	
     	mv a0, s8			# a0 = collisionMap
     	
-    	lw t3, 12(s1)
-    	
+    	lw t3, 12(s1)			# t3 = runningStateBoateng
+	
 	beqz t0, boaXZero
 	bgtz t0, boaXGreater
-	bltz t0, boaYLess
+	bltz t0, boaXLess
 	
-boaXZero:
-	beqz t3, boaXZeroLeft
+boaXZero:	# x == 0
+	beqz t3, boaXZeroLeft		
 	addi t3, t3, -1
 	beqz t3, boaXZeroRight
 	addi t3, t3, -1
 	beqz t3, boaXZeroUp
 	j boaXZeroDown
-	boaXZeroLeft:
-		beqz t2, boaTouch
+	boaXZeroLeft:		# t3 == 0
+		beqz t2, boaTouch	# se y == 0, pula pra boaTouch
 		bltz t2, boaXZeroLeftUp
 		bgtz t2, boaXZeroLeftDown
-		boaXZeroLeftUp:
-			li a4, 141
+		boaXZeroLeftUp:		# y < 0
+			li a4, 141	# a4 = 10.00.11.01 ( cima, esquerda, baixo, direita )
 			j moveBoa
-		boaXZeroLeftDown:
-			li a4, 201
+		boaXZeroLeftDown:	# y > 0
+			li a4, 201	# a4 = 11.00.10.01 ( baixo, esquerda, cima, direita )
 			j moveBoa
-	boaXZeroRight:
-		beqz t2, boaTouch
+	boaXZeroRight:		# t3 == 1
+		beqz t2, boaTouch	# se y == 0, pula pra boaTouch
 		bltz t2, boaXZeroRightUp
 		bgtz t2, boaXZeroRightDown
-		boaXZeroRightUp:
-			li a4, 156
+		boaXZeroRightUp:	# y < 0	
+			li a4, 156	# a4 = 10.01.11.00 ( cima, direita, baixo, esquerda )
 			j moveBoa
-		boaXZeroRightDown:
-			li a4, 216
+		boaXZeroRightDown:	# y > 0
+			li a4, 216	# a4 = 11.01.10.00 ( baixo, direita, cima, esquerda )
 			j moveBoa
-	boaXZeroUp:
-		beqz t2, boaTouch
-		li a4, 135
-		j moveBoa
+	boaXZeroUp:		# t3 == 2
+		beqz t2, boaTouch	# se y == 0, pula pra boaTouch
+		bltz t2,boaXZeroUpUp
+		bgtz t2, boaXZeroUp
+		boaXZeroUpUp:	# y < 0
+			li a4, 147	# a4 = 10.01.00.11 ( cima, diretia, esquerda, baixo )
+			j moveBoa
+		boaXZeroUpDown:	# y > 0
+			li a4, 27	# a4 = 00.01.10.11 ( esquerda, direita, cima, baixo )
+			j moveBoa
 	 boaXZeroDown:
-	 	beqz t2, boaTouch
-	 	li a4, 198
-	 	j moveBoa
-boaXGreater:
+	 	beqz t2, boaTouch	# se y == 0, pula pra boaTouch
+	 	bltz t2, boaXZeroDownUp
+	 	bgtz t2, boaXZeroDownDown
+	 	boaXZeroDownUp:
+	 		li a4, 75		# a4 = 01.00.10.11 ( direita, esquerda, cima, baixo )
+	 		j moveBoa
+	 	boaXZeroDownDown:
+	 		li a4, 198		# a4 = 11.00.01.10 ( baixo, esquerda, direita, cima )
+	 		j moveBoa
+boaXGreater:	# x > 0 ( direita )
 	beqz t3, boaXGreaterLeft
 	addi t3, t3, -1
 	beqz t3, boaXGreaterRight
 	addi t3, t3, -1
 	beqz t3, boaXGreaterUp
 	j boaXGreaterDown
-	boaXGreaterLeft:
-		bgez t2, boaXGreaterLeftDown
+	boaXGreaterLeft:	# t3 == 0
 		bltz t2, boaXGreaterLeftUp
-		boaXGreaterLeftDown:
-			li a4, 201
+		bgez t2, boaXGreaterLeftDown
+		boaXGreaterLeftUp:	# y < 0
+			li a4, 141	# a4 = 10.00.11.01 ( cima, esqurda, baixo, direita )
 			j moveBoa
-		boaXGreaterLeftUp:
-			li a4, 141
+		boaXGreaterLeftDown:	# y >= 0
+			li a4, 201	# a4 = 11.00.10.01 ( baixo, esquerda, cima, direita )
 			j moveBoa
-	boaXGreaterRight:
-		bgez t2, boaXGreaterRightDown
+	boaXGreaterRight:	# t3 == 1
 		bltz t2, boaXGreaterRightUp
-		boaXGreaterRightDown:
-			li a4, 114
+		bgez t2, boaXGreaterRightDown
+		boaXGreaterRightUp:	# y < 0
+			li a4, 108	# a4 = 01.10.11.00 ( direita, cima, baixo, esquerda )
 			j moveBoa
-		boaXGreaterRightUp:
-			li a4, 120
+		boaXGreaterRightDown:	
+			li a4, 120	# a4 = 01.11.10.00 ( direita, baixo, cima, esquerda )
 			j moveBoa
-	boaXGreaterUp:
-		li a4, 75
-		j moveBoa
-	boaXGreaterDown:
-		li a4, 78
-		j moveBoa
-boaYLess:
-	beqz t3, boaYLessLeft
+	boaXGreaterUp:		# t3 == 2
+		bltz t2, boaXGreaterUpUp
+		bgez t2, boaXGreaterUpDown
+		boaXGreaterUpUp:			
+			li a4, 99	# a4 = 01.10.00.11 ( direita, cima, esquerda, baixo ) 	
+			j moveBoa
+		boaXGreaterUpDown:
+			li a4, 75	# a4 = 01.00.10.11 ( direita, esquerda, cima, baixo )
+			j moveBoa
+	boaXGreaterDown:	# t3 == 3
+		bltz t2, boaXGreaterDownUp
+		bgez t3, boaXGreaterDownDown
+		boaXGreaterDownUp:
+			li a4, 78	# a4 = 01.00.11.10 ( direita, esquerda, baixo, cima )
+			j moveBoa		
+		boaXGreaterDownDown:
+			li a4, 114	# a4 = 01.11.00.10 ( direita, baixo, esquerda, cima )
+			j moveBoa
+
+boaXLess:	# x < 0 (esquerda)
+	beqz t3, boaXLessLeft	
 	addi t3, t3, -1
-	beqz t3, boaYLessRight
+	beqz t3, boaXLessRight
 	addi t3, t3, -1
-	beqz t3, boaYLessUp
-	j boaYLessDown
-	boaYLessLeft:
-		bgez t2, boaYLessLeftDown
-		j boaYLessLeftUp
-		boaYLessLeftDown:
-			li a4, 57
+	beqz t3, boaXLessUp
+	addi t3, t3, -1
+	beqz t3, boaXLessDown
+	boaXLessLeft:		# t3 == 0
+		bltz t2, boaXLessLeftUp
+		bgez t2, boaXLessLeftDown
+		boaXLessLeftUp:		# y < 0
+			li a4, 45	# a4 = 00.10.11.01 ( esquerda, cima, baixo, direita )
 			j moveBoa
-		boaYLessLeftUp:
-			li a4, 45
+		boaXLessLeftDown:	# y >= 0
+			li a4, 57	# a4 = 00.11.10.01 ( esquerda, baixo, cima, direita )
 			j moveBoa
-	boaYLessRight:
-		bgez t2, boaYLessRightDown
-		j boaYLessRightUp
-		boaYLessRightDown:
-			li a4, 220
+	boaXLessRight:		# t3 == 1
+		bltz t2, boaXLessRightUp
+		bgez t2, boaXLessRightDown
+		boaXLessRightUp:	# y < 0
+			li a4, 156	# a4 = 10.01.11.00 ( cima, direita, baixo, esquerda )
 			j moveBoa
-		boaYLessRightUp:
-			li a4, 156
+		boaXLessRightDown:	# y >= 0
+			li a4, 216	# a4 = 11.01.10.00 ( baixo, direita, cima, esquerda )  
 			j moveBoa
-	boaYLessUp:
-		li a4, 39
-		j moveBoa
-	boaYLessDown:
-		li a4, 54
-		j moveBoa
+	boaXLessUp:		# t3 == 2
+		bltz t2, boaXLessUpUp
+		bgez t2, boaXLessUpDown
+		boaXLessUpUp:		# y < 0
+			li a4, 39	# a4 = 00.10.01.11 ( esquerda, cima, direita, baixo )  
+			j moveBoa
+		boaXLessUpDown:		# y >= 0
+			li a4, 27 	# a4 = 00.01.10.11 ( esquerda, direita, cima, baixo )
+			j moveBoa
+	boaXLessDown:		# t3 == 3    	
+		bltz t2, boaXLessDownUp
+		bgez t2, boaXLessDownDown
+		boaXLessDownUp:		# y < 0
+			li a4, 30 	# a4 = 00.01.11.10 ( esquerda, direita, baixo, cima )
+		 	j moveBoa
+		boaXLessDownDown: 	# y < 0
+			li a4, 54	# a4 = 00.11.01.10 ( esquerda, baixo, direita, cima )
+			j moveBoa
 boaTouch:
 	#tira vida
+	addi s0, s0, -1
+	bgtz s0, restartGame  
+	li a7, 10
+	ecall
 		
 moveBoa:
 	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
 	slli t1, t0, 6
 	sub a4, a4, t1
 	slli a4, a4, 2			# a4 = xx.xx.xx.00
-	
+
 	mv a0, s8			# a0 = collisionMap
 	
 	bnez t0, moveBoaRight		# t0 == 0
@@ -595,27 +636,16 @@ moveBoaDown:
 	addi a2, a2, 4			# update da posicao para 4 pixels para a baixo
 	
 	li t1, 228
-	bne a2, t1, dontTeleportDownBoa
+	bne a2, t1, boaHasMoved
 	li a2, 12 
-	dontTeleportDownBoa:
-	j boaHasMoved
-
-
-boaHasMoved:
-	la a0, ae
-	li a7, 4
-	ecall
 	
+boaHasMoved:
 	mv a0, s4
 	sw a1, 0(s1)
     	sw a2, 4(s1)
     	call print
-    	
-muller:	
-	
-    	
-    	
 
+muller:	
 
 	li a0,76			# pausa de 76m segundos
 	li a7,32
@@ -626,6 +656,10 @@ muller:
 endGame:
 	mv ra, a6		
 	ret
+restartGame:
+	mv ra, a6
+	addi ra, ra, -16
+	ret
 	
 .include "src/print.s"
 .include "src/checkCollision.s"
@@ -633,10 +667,11 @@ endGame:
 
 .data
 fulecoInfo: .word 144, 176, 0, 0, 0, 1, 0	# posX, posY, runningState, points, superState, frameAnimacao, leftOrRight
-germanyInfo: .word 114, 128, -130, 0, 0	 	#posXBoa, posYBoa, timeOutBoa, runningStateBoa, leftorRightBoa		#134, 128, 154, 128, 174, 128
+germanyInfo: .word 114, 128, -130, 0, 0, 0 	#posXBoa, posYBoa, timeOutBoa, runningStateBoa, frameAnimacaoBoa,leftorRightBoa		#134, 128, 154, 128, 174, 128
 space: .string " "
 ae: .string "a\n"
 be: .string "b\n"
+ce: .string "c\n"
 .include "sprites/props/arquivos .data/dot.data"
 .include "sprites/props/arquivos .data/brazuca.data"
  

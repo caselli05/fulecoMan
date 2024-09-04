@@ -62,6 +62,7 @@ LOOP2:	li t1,0xFF200000	# carrega o endereco de controle do KDMMIO
    	beq t0,zero,MUSIC   	# Se nao ha tecla pressionada entao vai para MUSIC
   	lw t2,4(t1)  		# le o valor da tecla tecla
 	sw t2,12(t1)  		# escreve a tecla pressionada no display
+	li s0, 3
 	beq t2, t3, gameOneStart# vai pro mapa 1
 	beq t2, t4, gameTwoStart# "hack" pro mapa 2
 	
@@ -99,8 +100,6 @@ gameTwoStart:
 	la s10, fulecoLeft0
 	call main
 	
-	j COMECO
-
 end:
 	li a7, 10
 	ecall
