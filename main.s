@@ -34,15 +34,17 @@ main:
 	call print
 	
     # setup Boateng
-    	la s1, germanyInfo		# s1 = germanyInfo
+    	la s1, germanyInfo		# s1 = germanyInfo			114, 128, -130, 0, 0, 0
     	li t1, 114			# t1 = 144
     	li t2, 128			# t2 = 128
     	sw t1, 0(s1)			# posXBoa = 144
     	sw t2, 4(s1)			# posYBoa = 128
-    	li t1, -13			
+    	li t1, -130			
     	sw t1, 8(s1)			# timeOutBoa = -130
 	li t0, 0			
-	sw t0, 12(s1)			# comeca o leftOrRightBoa em 0(left)
+	sw t0, 12(s1)			# comeca o runningStateBoa em 0(left)
+	sw t0, 16(s1)			# comeca o leftOrRightBoa em 0(left)
+	sw t0, 20(s1)			# comeca o frameBoa em 0
 	
 	
 	li a3, 0
@@ -311,23 +313,32 @@ dontChangeFrameAnimacao:
 	li t1, 7			# t1 = 7	
 	bne t1, t2, dontAddPoints	# se t1 != t2, pula pra "dontAddPoints"
 	li t1, 17			# t1 = 17		 
-	sw t1, 8(t0)			# guarda 17 no endereco que a bolinha recem pegada estava
+	sb t1, 8(t0)			# guarda 17 no endereco que a bolinha recem pegada estava
+	
 	lw t0, 12(s11)			# t0 = pontos
 	addi t0, t0, 1			# adiciona 1 ponto
 	sw t0, 12(s11)			# guarda os pontos
 	li t1, 115			# t1 = 115
 	beq t0, t1, endGame		# se pontos == 115, acaba a run
-	
 dontAddPoints:
+	lw t3, 12(s11)
+	mv a0, t3
+	li a7, 1
+	ecall
+	la a0, space
+	li a7, 4
+	ecall
+	
 	li t1, 192			# t1 = 192
 	bne t1, t2, dontBeSuper		# se t1 != t2, pula pra dontBeSuper
 	li t1, 17			# t1 = 17
-	sw t1, 8(t0)			# guarda 17 no endereco da brazuca recem pegada
+	sb t1, 8(t0)			# guarda 17 no endereco da brazuca recem pegada
 	# trocar o estado de superfuleco
 	lw t1, 16(s11)			# t1 = superState
 	bne t1, zero, dontChangeSuperSprite	# sw t1 != 0, pula pra dontChangeSuperState
 	li t0, 1056			# t0 = 1056
 	add s10, s10, t0		# s10 += 1056
+	add s4, s4, t0			# s4 += 1056
 dontChangeSuperSprite:
 	li t1, 132			# t1 = 132
 	sw t1, 16(s11)			# superState = 132
@@ -340,6 +351,7 @@ dontBeSuper:
 	bnez t0, isNotSuper		# se t0 == 0, pula pra isNotSuper
 	li t0, 1056			# t0 = 1056
 	sub s10, s10, t0		# s10 -= 1056
+	sub s4, s4, t0			# s4 -= 1056
 		
 isNotSuper:
     # Boateng
@@ -543,11 +555,12 @@ boaTouch:
 		sw t1, 8(s1)			# boaTimeout = -131
 		li t0, 0
 		lw t1, 20(s1)			# t1 = boaLeftOrRight
-		beq t0, t1, boaIsDeadAndLeft	
+		beqz t1, boaIsDeadAndLeft	
 		addi s4, s4, -528		# s4 -= 528, se tiver pra direita 
+		sw t0, 20(s1)			# boaLeftOrRight = 0 = esquerda
 		boaIsDeadAndLeft:
 		lw t1, 16(s1)			# t1 = frameBoa
-		beq t1, t0, boaIsDeadAndFrame0
+		bgtz t1, boaIsDeadAndFrame0	
 		addi s4, s4, -264		# s4 -= 264, se tiver no frame 1
 		sw zero, 16(s1)			# frameBoa = 0
 		boaIsDeadAndFrame0:
@@ -582,13 +595,13 @@ moveBoa:
 	addi a2, a2, -15		# cancela o update temporario do eixo Y
 	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
 	
-	li t0, 0
-	lw t1, 20(s1)
-	beq t0, t1, boaIsLeft
-	addi s4, s4, -528
-	sw t0, 20(s1)
+	li t0, 0			# t0 = 0
+	lw t1, 20(s1)			# t1 = boaLeftOrRight
+	beq t0, t1, boaIsLeft	
+	addi s4, s4, -528		# s4 -= 528, se tiver pra direita
+	sw t0, 20(s1)			# boaLeftOrRight = 0 = esquerda
 	boaIsLeft:
-	sw t0, 12(s1)
+	sw t0, 12(s1)			# boaRunningState = 0 = equerda
 	
 	addi a1, a1, -4			# update da posicao para 4 pixels para a esquerda
 	
@@ -619,13 +632,13 @@ moveBoaRight:
 	li t0, 0			# t0 = 0
 	beq t1, t0, moveBoa		# se ha colisao, pula para "moveBoa"
 	
-	li t0, 1
-	lw t1, 20(s1)
-	beq t0, t1, boaIsRight
-	addi s4, s4, 528
-	sw t0, 20(s1)
+	li t0, 1			# t0 = 1
+	lw t1, 20(s1)			# t1 = boaLeftOrRight
+	beq t0, t1, boaIsRight	 
+	addi s4, s4, 528		# s4 += 528, se estiver pra esquerda
+	sw t0, 20(s1)			# boaLeftOrRight = 1 = direita
 	boaIsRight:
-	sw t0, 12(s1)
+	sw t0, 12(s1)			# boaRunningState = 1 = direita
 	
 	addi a1, a1, 4			# update da posicao para 4 pixels para a direita
 	
@@ -732,7 +745,7 @@ endGame:
 	ret
 restartGame:
 	mv ra, a6
-	addi ra, ra, -16
+	addi ra, ra, -20
 	ret
 	
 .include "src/print.s"
