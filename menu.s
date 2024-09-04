@@ -135,6 +135,11 @@ NOTAS: 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 5
 .include "sprites/alemanha/arquivos .data/BoatengRight0.data"		# inclui o .data com o Boateng Right 0
 .include "sprites/alemanha/arquivos .data/BoatengRight1.data"		# inclui o .data com o Boateng Right 1
 
+.include "sprites/alemanha/arquivos .data/BoatengLeft0Inv.data"		# inclui o .data com o Boateng Left 0 Inv
+.include "sprites/alemanha/arquivos .data/BoatengLeft1Inv.data"		# inclui o .data com o Boateng Left 1 Inv
+.include "sprites/alemanha/arquivos .data/BoatengRight0Inv.data"	# inclui o .data com o Boateng Right 0 Inv
+.include "sprites/alemanha/arquivos .data/BoatengRight1Inv.data"	# inclui o .data com o Boateng Right 1 Inv
+
 
 
 
