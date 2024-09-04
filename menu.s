@@ -1,12 +1,12 @@
 ###############
 # s0 =
-# s1 = 
+# s1 = alemanhaInfo
 # s2 = endereco das notas
 # s3 = numero de notas
-# s4 =
-# s5 =
-# s6 =
-# s7 = 
+# s4 = sprite Boateng
+# s5 = sprite Gotze
+# s6 = sprite Kross 
+# s7 = sprite Muller
 # s8 = mapa
 # s9 = mapacColisao
 # s10 = sprite fuleco
@@ -62,6 +62,7 @@ LOOP2:	li t1,0xFF200000	# carrega o endereco de controle do KDMMIO
    	beq t0,zero,MUSIC   	# Se nao ha tecla pressionada entao vai para MUSIC
   	lw t2,4(t1)  		# le o valor da tecla tecla
 	sw t2,12(t1)  		# escreve a tecla pressionada no display
+	li s0, 3
 	beq t2, t3, gameOneStart# vai pro mapa 1
 	beq t2, t4, gameTwoStart# "hack" pro mapa 2
 	
@@ -85,6 +86,7 @@ MUSIC2:	lw a0, 0(a5)
 	
 gameOneStart:
     # setup dos sprites
+        la s4, fixedBoateng0
 	la s8, map1Collision
 	la s9, map1
 	la s10, fulecoLeft0
@@ -92,13 +94,12 @@ gameOneStart:
 	
 gameTwoStart:
     # setup dos sprites
+    	la s4, fixedBoateng0
 	la s8, map2Collision
 	la s9, map2
 	la s10, fulecoLeft0
 	call main
 	
-	j COMECO
-
 end:
 	li a7, 10
 	ecall
@@ -128,6 +129,11 @@ NOTAS: 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 5
 .include "sprites/fuleco/arquivos .data/fulecoBallLeft1.data"		# inclui o .data com o Fuleco Ball Left 1
 .include "sprites/fuleco/arquivos .data/fulecoBallRight0.data"		# inclui o .data com o Fuleco Ball Right 0
 .include "sprites/fuleco/arquivos .data/fulecoBallRight1.data"		# inclui o .data com o Fuleco Ball Right 1
+    # Sprites do Boateng
+.include "sprites/alemanha/arquivos .data/BoatengLeft0.data"		# inclui o .data com o Boateng Left 0
+.include "sprites/alemanha/arquivos .data/BoatengLeft1.data"		# inclui o .data com o Boateng Left 1
+.include "sprites/alemanha/arquivos .data/BoatengRight0.data"		# inclui o .data com o Boateng Right 0
+.include "sprites/alemanha/arquivos .data/BoatengRight1.data"		# inclui o .data com o Boateng Right 1
 
 
 
