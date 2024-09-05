@@ -724,6 +724,154 @@ boaHasMoved:
 		sw t0, 16(s1)			# guarda t0 em frameBoaAnimacao
 
 muller:	
+	lw a1, 24(s1)			# a1 = posXMuller
+	lw a2, 28(s1)			# a2 = posYMuller
+	
+	lw t0, 32(s1)			# t0 = timeOutMul
+	bgtz t0, dontStartMul		
+	addi t0, t0, 1
+	sw t0, 32(s1)
+	bnez t0, mulHasMoved
+	li t1, 144			
+    	li t2, 96
+    	li t3, 1
+    	sw t1, 24(s1)			# posXMul = 144
+    	sw t2, 28(s1)			# posYBoa = 96
+    	sw t3, 36(s1)			# runningStateMul = 1 (left)
+    	sw t3, 40(s1)			# frameMulAnimacao = 1
+	dontStartMul:
+	lw a1, 24(s1)			# a1 = posXMul
+	lw a2, 28(s1)			# a2 = posYMul
+	
+	lw t0, 0(s11)			# t0 = posXFuleco			
+    	lw t1, 4(s11)			# t1 = posYFuleco
+    	sub t0, t0, a1			# t0 = posXFul - poxXBoa
+    	sub t2, t1, a2			# t1 = posYFul - posYBoa
+
+    	mv a0, s8			# a0 = collisionMap
+    	
+    	lw t3, 36(s1)			# t3 = runningStateMul
+    	
+    	lw t4, 16(s11)			# t4 = superState
+
+	bnez t4, mulIsAfraid
+	beqz t2, mulYZero
+	bgtz t2, mulYGreater
+	bltz t2, mulYLess
+	
+mulIsAfraid:
+	beqz t3, mulIsAfraidLeft		
+	addi t3, t3, -1
+	beqz t3, mulIsAfraidRight
+	addi t3, t3, -1
+	beqz t3, mulIsAfraidUp
+	j mulIsAfraidDown
+	mulIsAfraidLeft:
+		li a4, 177 		# a4 = 10.11.00.01 ( cima, baixo, esquerda, direita )
+		j moveMul
+	mulIsAfraidRight:	
+		li a4, 228 		# a4 = 11.10.01.00 ( baixo, cima, direita, esquerda )
+		j moveMul
+	mulIsAfraidUp:
+		li a4, 75 		# a4 = 01.00.10.11 ( direita, esquerda, cima, baixo )
+		j moveMul
+	mulIsAfraidDown:
+		li a4, 30		# a4 = 00.01.11.10 ( esquerda, direita, baixo, cima )
+		j moveMul
+		
+mulYZero:
+	beqz t3, mulYZeroLeft		
+	addi t3, t3, -1
+	beqz t3, mulYZeroRight
+	addi t3, t3, -1
+	beqz t3, mulYZeroUp
+	j mulYZeroDown
+	mulYZeroLeft:	# 
+		bltz t0, mulYZeroLeftLeft
+		beqz t0, mulTouch
+		bgtz t0, mulYZeroLeftRight
+		mulYZeroLeftLeft:
+			li a4, 45		# a4 = 00.10.11.01 ( esquerda, cima, baixo, direita ) 
+			j moveMul
+		mulYZeroLeftRight:
+			li a4, 225		# a4 = 11.10.00.01 ( baixo, cima, esquerda, direita ) 
+			j moveMul
+	mulYZeroRight:
+		bltz t0, mulYZeroRightLeft
+		beqz t0, mulTouch
+		bgtz t0, mulYZeroRightRight
+		mulYZeroRightLeft:
+			li a4, 177 		# a4 = 10.11.00.01 ( cima, baixo, esquerda, direita )
+			j moveMul
+		mulYZeroRightRight:
+			li a4, 120 		# a4 = 01.11.10.00 ( direita, baixo, cima, esquerda )
+			j moveMul
+	mulYZeroUp:
+		bltz t0, mulYZeroUpLeft
+		beqz t0, mulTouch
+		bgtz t0, mulYZeroUpRight
+		mulYZeroUpLeft:
+			li a4, 39		# a4 = 00.10.01.11 ( esquerda, cima, direita, baixo )
+			j moveMul
+		mulYZeroUpRight:
+			li a4, 99		# a4 = 01.10.00.11 ( direita, cima, esquerda, baixo )
+			j moveMul
+	mulYZeroDown:
+		bltz t0, mulYZeroDownLeft
+		beqz t0, mulTouch
+		bgtz t0, mulYZeroDownRight
+		mulYZeroDownLeft:
+			li a4, 54 		# a4 = 00.11.01.10 ( esquerda, baixo, direita, cima )
+			j moveMul
+		mulYZeroDownRight:
+			li a4, 114		# a4 = 01.11.00.10 ( direita, baixo, esquerda, cima )
+			j moveMul
+mulYGreater:
+	beqz t3, mulYGreaterLeft		
+	addi t3, t3, -1
+	beqz t3, mulYGreaterRight
+	addi t3, t3, -1
+	beqz t3, mulYGreaterUp
+	j mulYGreaterDown
+	mulYGreaterLeft:
+		bltz t0, mulYGreaterLeftLeft
+		bgez t0, mulYGreaterLeftRight
+		mulYGreaterLeftLeft:
+			li a4, 200 		# a4 = 11.00.10.00 ( baixo, esquerda, cima, direita )
+			j moveMul
+		mulYGreaterLeftRight:
+			li a4, 228		# a4 = 11.10.01.00 ( baixo, cima, direita, esquerda )
+			j moveMul
+	mulYGreaterRight:
+		bltz t0, mulYGreaterRightLeft
+		bgez t0, mulYGreaterRightRight
+		mulYGreaterRightLeft:
+			li a4, 225 		# a4 = 11.10.00.01 ( baixo, cima, esquerda, direita )
+			j moveMul
+		mulYGreaterRightRight:
+			li a4, 216		# a4 = 11.01.10.00 ( baixo, direita, cima, esquerda )
+			j moveMul
+	mulYGreaterUp:
+		bltz t0, mulYGreaterUpLeft
+		bgez t0, mulYGreaterUpRight
+		mulYGreaterUpLeft:
+			li a4, 27		# a4 = 00.01.10.11 ( esquerda, direita, cima, baixo )
+			j moveMul
+		mulYGreaterUpRight:
+			li a4, 75		# a4 = 01.00.10.11 ( direita, esquerda, cima, baixo ) 
+			j moveMul
+	mulYGreaterDown:
+		bltz t0, mulYGreaterDownLeft
+		bgtz t0, mulYGreaterDownRight
+		mulYGreaterDownLeft:
+		
+		
+		mulYGreaterDownRight:
+		
+		
+moveMul:	
+
+gotze:
 
 	li a0,76			# pausa de 76m segundos
 	li a7,32

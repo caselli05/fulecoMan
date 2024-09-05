@@ -1,5 +1,5 @@
 ###############
-# s0 =
+# s0 = vida
 # s1 = alemanhaInfo
 # s2 = endereco das notas
 # s3 = numero de notas
@@ -102,6 +102,8 @@ gameTwoStart:
 	call main
 	
 end:
+	#gameover
+	#you win
 	li a7, 10
 	ecall
 
