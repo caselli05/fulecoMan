@@ -14,10 +14,10 @@ checkCollision:
 	add t0, t0, t1
 	
 	add t3, a0, t0
-	lw t1, 8(t3)
-	srli t1, t1, 24
+	lb t1, 11(t3)
+	#srli t1, t1, 24
 	
-	li t0, 255
+	li t0, -1
 	beq t1, t0, block
 	li t1, 1
 	ret

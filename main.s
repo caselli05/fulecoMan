@@ -389,7 +389,7 @@ boaIsAfraid:
 	beqz t3, boaIsAfraidUp
 	j boaIsAfraidDown
 	boaIsAfraidLeft:
-		li a4, 113 		# a4 = 01.11.00.01 ( cima, baixo, esquerda, direita )
+		li a4, 177 		# a4 = 10.11.00.01 ( cima, baixo, esquerda, direita )
 		j moveBoa
 	boaIsAfraidRight:	
 		li a4, 228 		# a4 = 11.10.01.00 ( baixo, cima, direita, esquerda )
@@ -745,12 +745,15 @@ restartGame:
 
 .data
 fulecoInfo: .word 144, 176, 0, 0, 0, 1, 0	# posX, posY, runningState, points, superState, frameAnimacao, leftOrRight
-germanyInfo: .word 114, 128, -130, 0, 0, 0 	#posXBoa, posYBoa, timeOutBoa, runningStateBoa, frameAnimacaoBoa,leftorRightBoa		#134, 128, 154, 128, 174, 128
+germanyInfo: .word 114, 128, -130, 0, 0, 0, 134, 128, -180, 0, 0, 0 	# 154, 128, 174, 128
+	# posXBoa(0), posYBoa(4), timeOutBoa(8), runningStateBoa(12), frameAnimacaoBoa(16), leftorRightBoa(20)
+	# posXMul(24), posYMul(28), timeOutMul(32), runningStateMul(36), frameAnimacaoMul(40), leftOrRightMul(44)
+									
 space: .string " "
-ae: .string "a\n"
+ae: .string "moveu\n"
 be: .string "b\n"
 ce: .string "c\n"
-de: .string "b\n"
+de: .string "afraid "
 .include "sprites/props/arquivos .data/dot.data"
 .include "sprites/props/arquivos .data/brazuca.data"
  
