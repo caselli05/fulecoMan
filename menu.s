@@ -92,6 +92,7 @@ gameOneStart:
 	la s10, fulecoLeft0
 	call main
 	
+	sw zero, 12(s11)
 gameTwoStart:
     # setup dos sprites
     	la s4, fixedBoateng0

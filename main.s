@@ -21,7 +21,6 @@ main:
 	li t2, 0			# t2 = 0
 	sw t2, 8(s11)			# comeca o runningState para 0
 	li t3, 0			# t3 = 0
-	sw t3, 12(s11)			# comeca os pontos para 0
 	li t4, 0			# t4 = 0
 	sw t4, 16(s11)			# comeca o superState para 0
 	li t5, 1			# t5 = 0
@@ -321,14 +320,6 @@ dontChangeFrameAnimacao:
 	li t1, 115			# t1 = 115
 	beq t0, t1, endGame		# se pontos == 115, acaba a run
 dontAddPoints:
-	lw t3, 12(s11)
-	mv a0, t3
-	li a7, 1
-	ecall
-	la a0, space
-	li a7, 4
-	ecall
-	
 	li t1, 192			# t1 = 192
 	bne t1, t2, dontBeSuper		# se t1 != t2, pula pra dontBeSuper
 	li t1, 17			# t1 = 17
