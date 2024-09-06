@@ -45,6 +45,19 @@ main:
 	sw t0, 16(s1)			# comeca o leftOrRightBoa em 0(left)
 	sw t0, 20(s1)			# comeca o frameBoa em 0
 	
+    # setup Muller
+    	li t1, 134			# t1 = 134
+    	li t2, 128			# t2 = 128
+    	sw t1, 24(s1)			# posXMul = 134
+    	sw t2, 28(s1)			# posYMul = 128
+    	li t1, -180			
+    	sw t1, 32(s1)			# timeOutBoa = -180
+	li t0, 0			
+	sw t0, 36(s1)			# comeca o runningStateMul em 0(left)
+	sw t0, 40(s1)			# comeca o leftOrRightMul em 0(left)
+	sw t0, 44(s1)			# comeca o frameMul em 0
+    	
+	
 	
 	li a3, 0
 loopgame:
@@ -330,6 +343,7 @@ dontAddPoints:
 	li t0, 1056			# t0 = 1056
 	add s10, s10, t0		# s10 += 1056
 	add s4, s4, t0			# s4 += 1056
+	add s5, s5, t0
 dontChangeSuperSprite:
 	li t1, 132			# t1 = 132
 	sw t1, 16(s11)			# superState = 132
@@ -343,6 +357,7 @@ dontBeSuper:
 	li t0, 1056			# t0 = 1056
 	sub s10, s10, t0		# s10 -= 1056
 	sub s4, s4, t0			# s4 -= 1056
+	sub s5, s5, t0
 		
 isNotSuper:
     # Boateng
@@ -696,9 +711,9 @@ moveBoaDown:
 	li a2, 12 
 	
 boaHasMoved:
-	mv a0, s4
-	sw a1, 0(s1)
-    	sw a2, 4(s1)
+	mv a0, s4				# a0 = spriteBoateng
+	sw a1, 0(s1)				# posXBoa = a1
+    	sw a2, 4(s1)				# posYBoa = a2
     	call print
     	
     	lw t1, 0(s11)
@@ -724,6 +739,386 @@ boaHasMoved:
 		sw t0, 16(s1)			# guarda t0 em frameBoaAnimacao
 
 muller:	
+	lw a1, 24(s1)			# a1 = posXMuller
+	lw a2, 28(s1)			# a2 = posYMuller
+	
+	lw t0, 32(s1)			# t0 = timeOutMul
+	bgtz t0, dontStartMul		
+	addi t0, t0, 1
+	sw t0, 32(s1)
+	bnez t0, mulHasMoved
+	li t1, 144			
+    	li t2, 96
+    	li t3, 1
+    	sw t1, 24(s1)			# posXMul = 144
+    	sw t2, 28(s1)			# posYMul = 96
+    	sw t3, 36(s1)			# runningStateMul = 1 (left)
+    	sw t3, 40(s1)			# frameMulAnimacao = 1
+	dontStartMul:
+	lw a1, 24(s1)			# a1 = posXMul
+	lw a2, 28(s1)			# a2 = posYMul
+	
+	lw t0, 0(s11)			# t0 = posXFuleco			
+    	lw t1, 4(s11)			# t1 = posYFuleco
+    	sub t0, t0, a1			# t0 = posXFul - poxXMul
+    	sub t2, t1, a2			# t1 = posYFul - posYMul
+
+    	mv a0, s8			# a0 = collisionMap
+    	
+    	lw t3, 36(s1)			# t3 = runningStateMul
+    	
+    	lw t4, 16(s11)			# t4 = superState
+    	
+	#bnez t4, mulIsAfraid
+	beqz t2, mulYZero
+	bgtz t2, mulYGreater
+	bltz t2, mulYLess
+	
+mulIsAfraid:
+	beqz t3, mulIsAfraidLeft		
+	addi t3, t3, -1
+	beqz t3, mulIsAfraidRight
+	addi t3, t3, -1
+	beqz t3, mulIsAfraidUp
+	j mulIsAfraidDown
+	mulIsAfraidLeft:
+		li a4, 177 		# a4 = 10.11.00.01 ( cima, baixo, esquerda, direita )
+		j moveMul
+	mulIsAfraidRight:	
+		li a4, 228 		# a4 = 11.10.01.00 ( baixo, cima, direita, esquerda )
+		j moveMul
+	mulIsAfraidUp:
+		li a4, 75 		# a4 = 01.00.10.11 ( direita, esquerda, cima, baixo )
+		j moveMul
+	mulIsAfraidDown:
+		li a4, 30		# a4 = 00.01.11.10 ( esquerda, direita, baixo, cima )
+		j moveMul
+		
+mulYZero:
+	beqz t3, mulYZeroLeft		
+	addi t3, t3, -1
+	beqz t3, mulYZeroRight
+	addi t3, t3, -1
+	beqz t3, mulYZeroUp
+	j mulYZeroDown
+	mulYZeroLeft:	 
+		bltz t0, mulYZeroLeftLeft
+		beqz t0, mulTouch
+		bgtz t0, mulYZeroLeftRight
+		mulYZeroLeftLeft:
+			li a4, 45		# a4 = 00.10.11.01 ( esquerda, cima, baixo, direita ) 
+			j moveMul
+		mulYZeroLeftRight:
+			li a4, 225		# a4 = 11.10.00.01 ( baixo, cima, esquerda, direita ) 
+			j moveMul
+	mulYZeroRight:
+		bltz t0, mulYZeroRightLeft
+		beqz t0, mulTouch
+		bgtz t0, mulYZeroRightRight
+		mulYZeroRightLeft:
+			li a4, 180 		# a4 = 10.11.01.00 ( cima, baixo, direita, esquerda )
+			j moveMul
+		mulYZeroRightRight:
+			li a4, 120 		# a4 = 01.11.10.00 ( direita, baixo, cima, esquerda )
+			j moveMul
+	mulYZeroUp:
+		bltz t0, mulYZeroUpLeft
+		beqz t0, mulTouch
+		bgtz t0, mulYZeroUpRight
+		mulYZeroUpLeft:
+			li a4, 39		# a4 = 00.10.01.11 ( esquerda, cima, direita, baixo )
+			j moveMul
+		mulYZeroUpRight:
+			li a4, 99		# a4 = 01.10.00.11 ( direita, cima, esquerda, baixo )
+			j moveMul
+	mulYZeroDown:
+		bltz t0, mulYZeroDownLeft
+		beqz t0, mulTouch
+		bgtz t0, mulYZeroDownRight
+		mulYZeroDownLeft:
+			li a4, 54 		# a4 = 00.11.01.10 ( esquerda, baixo, direita, cima )
+			j moveMul
+		mulYZeroDownRight:
+			li a4, 114		# a4 = 01.11.00.10 ( direita, baixo, esquerda, cima )
+			j moveMul
+mulYGreater:
+	beqz t3, mulYGreaterLeft		
+	addi t3, t3, -1
+	beqz t3, mulYGreaterRight
+	addi t3, t3, -1
+	beqz t3, mulYGreaterUp
+	j mulYGreaterDown
+	mulYGreaterLeft:
+		bltz t0, mulYGreaterLeftLeft
+		bgez t0, mulYGreaterLeftRight
+		mulYGreaterLeftLeft:
+			li a4, 201 		# a4 = 11.00.10.01 ( baixo, esquerda, cima, direita )
+			j moveMul
+		mulYGreaterLeftRight:
+			li a4, 225		# a4 = 11.10.00.01 ( baixo, cima, esquerda, direita )
+			j moveMul
+	mulYGreaterRight:
+		bltz t0, mulYGreaterRightLeft
+		bgez t0, mulYGreaterRightRight
+		mulYGreaterRightLeft:
+			li a4, 228 		# a4 = 11.10.01.00 ( baixo, cima, direita, esquerda )
+			j moveMul
+		mulYGreaterRightRight:
+			li a4, 216		# a4 = 11.01.10.00 ( baixo, direita, cima, esquerda )
+			j moveMul
+	mulYGreaterUp:
+		bltz t0, mulYGreaterUpLeft
+		bgez t0, mulYGreaterUpRight
+		mulYGreaterUpLeft:
+			li a4, 27		# a4 = 00.01.10.11 ( esquerda, direita, cima, baixo )
+			j moveMul
+		mulYGreaterUpRight:
+			li a4, 75		# a4 = 01.00.10.11 ( direita, esquerda, cima, baixo ) 
+			j moveMul
+	mulYGreaterDown:
+		bltz t0, mulYGreaterDownLeft
+		bgtz t0, mulYGreaterDownRight
+		mulYGreaterDownLeft:
+			li a4, 198 		# a4 = 11.00.01.10 ( baixo, esquerda, direita, cima ) 
+			j moveMul
+		mulYGreaterDownRight:
+			li a4, 210 		# a4 = 11.01.00.10 ( baixo, direita, esquerda, cima )
+			j moveMul
+mulYLess:
+	beqz t3, mulYLessLeft		
+	addi t3, t3, -1
+	beqz t3, mulYLessRight
+	addi t3, t3, -1
+	beqz t3, mulYLessUp
+	j mulYLessDown
+	mulYLessLeft:
+		bltz t0, mulYLessLeftLeft
+		bgez t0, mulYLessLeftRight
+		mulYLessLeftLeft:
+			li a4, 141 		# a4 = 10.00.11.01 ( cima, esquerda, baixo, direita )
+			j moveMul
+		mulYLessLeftRight:
+			li a4, 177		# a4 = 10.11.00.01 ( cima, baixo, esquerda, direita )
+			j moveMul
+	mulYLessRight:
+		bltz t0, mulYLessRightLeft
+		bgez t0, mulYLessRightRight
+		mulYLessRightLeft:
+			li a4, 180		# a4 = 10.11.01.00 ( cima, baixo, direita, esquerda )
+			j moveMul
+		mulYLessRightRight:
+			li a4, 156		# a4 = 10.01.11.00 ( cima, direita, baixo, esquerda )
+			j moveMul
+	mulYLessUp: 
+		bltz t0, mulYLessUpLeft
+		bgez t0, mulYLessUpRight
+		mulYLessUpLeft:
+			li a4, 135		# a4 = 10.00.01.11 ( cima, esquerda, direita, baixo )
+			j moveMul
+		mulYLessUpRight:
+			li a4, 147 		# a4 = 10.01.00.11 ( cima, direita, esquerda, baixo )
+			j moveMul
+	mulYLessDown:
+		bltz t0, mulYLessDownLeft
+		bgez t0, mulYLessDownRight
+		mulYLessDownLeft:
+			li a4, 30		# a4 = 00.01.11.10 ( esquerda, direita, baixo, cima )
+			j moveMul
+		mulYLessDownRight:
+			li a4, 78 		# a4 = 01.00.11.10 ( direita, esquerda, baixo, cima )
+			j moveMul
+mulTouch:	
+	lw t0, 16(s11)
+	
+	beqz t0, mulKillFuleco
+		li a1, 134			# posXMul = 134
+		li a2, 128			# posYMul = 128
+		li t1, -131
+		sw t1, 32(s1)			# mulTimeout = -131
+		li t0, 0
+		lw t1, 44(s1)			# t1 = mulLeftOrRight
+		beqz t1, mulIsDeadAndLeft	
+		addi s5, s5, -528		# s5 -= 528, se tiver pra direita 
+		sw t0, 44(s1)			# mulLeftOrRight = 0 = esquerda
+		mulIsDeadAndLeft:
+		lw t1, 40(s1)			# t1 = frameMul
+		bgtz t1, mulIsDeadAndFrame0	
+		addi s5, s5, -264		# s4 -= 264, se tiver no frame 1
+		sw zero, 40(s1)			# frameMul = 0
+		mulIsDeadAndFrame0:
+		j mulHasMoved
+
+	mulKillFuleco:			# superState == 0
+		addi s0, s0, -1
+		bgtz s0, restartGame  
+		li a7, 10
+		ecall		
+
+moveMul:
+	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
+	slli t1, t0, 6
+	sub a4, a4, t1
+	slli a4, a4, 2			# a4 = xx.xx.xx.00
+
+	mv a0, s8			# a0 = collisionMap
+	
+	bnez t0, moveMulRight		# t0 == 0
+	addi a1, a1, -4			# update temporario da posicao para 4 pixels para esquerda
+	call checkCollision		# check da colisao superior esquerda
+	li t0, 0			# t0 = 0
+	addi a1, a1, 4			# cancela o update temporario do eixo X
+	beq t1, t0, moveMul		# se ha colisao, pula para "moveMul"
+	
+	addi a1, a1, -4			# update da posicao para 4 pixels para esquerda
+	addi a2, a2, 15			# update da posicao para 15 pixels para baixo
+	call checkCollision		# check da colisao inferior esquerda
+	li t0, 0			# t0 = 0
+	addi a1, a1, 4			# cancela o update temporario do eixo X
+	addi a2, a2, -15		# cancela o update temporario do eixo Y
+	beq t1, t0, moveMul		# se ha colisao, pula para "moveMul"
+	
+	li t0, 0			# t0 = 0
+	lw t1, 44(s1)			# t1 = mulLeftOrRight
+	beq t0, t1, mulIsLeft	
+	addi s5, s5, -528		# s5 -= 528, se tiver pra direita
+	sw t0, 44(s1)			# mulLeftOrRight = 0 = esquerda
+	mulIsLeft:
+	sw t0, 36(s1)			# mulRunningState = 0 = equerda
+	
+	addi a1, a1, -4			# update da posicao para 4 pixels para a esquerda
+	
+	li t1, 0			# t1 = 0
+	bne a1, t1, dontTeleportLeftMul	# se posX != 0, pula pra "dontTeleportLeftMul"
+	li t1, 0			# t1 = 0
+	lw t0, 36(s1)
+	bne t0, t1, dontTeleportLeftMul	# se movState == right, pula pra "dontTeleportLeftMul" 
+	li a1, 288			# usa o teleporte da esquerda
+	dontTeleportLeftMul:
+	j mulHasMoved
+	
+moveMulRight:
+	li t1, 1
+	bne t0, t1, moveMulUp		# t0 == 1
+	
+	addi a1, a1, 16			# update temporario do eixo X para a direita 
+	call checkCollision		# check de colisao superior direita
+	addi a1, a1, -16		# cancela o update temporario do eixo X para a direita
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveMul		# se ha colisao, pula para "moveMul"
+	
+	addi a1, a1, 16			# update temporario do eixo X para a diereita
+	addi a2, a2, 15			# update temporario do eixo Y para baixo
+	call checkCollision		# check de colisao inferior direita
+	addi a1, a1, -16		# cancela o update temporario do eixo X para a direita
+	addi a2, a2, -15		# cancela o update temporario do eixo Y para a esquerda
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveMul		# se ha colisao, pula para "moveMul"
+	
+	li t0, 1			# t0 = 1
+	lw t1, 44(s1)			# t1 = mulLeftOrRight
+	beq t0, t1, mulIsRight	 
+	addi s5, s5, 528		# s5 += 528, se estiver pra esquerda
+	sw t0, 44(s1)			# mulLeftOrRight = 1 = direita
+	mulIsRight:
+	sw t0, 36(s1)			# mulRunningState = 1 = direita
+	
+	addi a1, a1, 4			# update da posicao para 4 pixels para a direita
+	
+	li t1, 300			# t1 = 300
+	bne a1, t1, dontTeleportRightMul# se posX != 300, pula pra "dontTeleportRightMul"
+	li t1, 1
+	lw t0, 36(s1)
+	bne t0, t1, dontTeleportRightMul# se movState == left, pula pra "dontTeleportRightMul"
+	li a1, 0			# usa o teleporte da direita
+	dontTeleportRightMul:
+	j mulHasMoved
+	
+moveMulUp:
+	li t1, 2
+	bne t0, t1, moveMulDown		# t0 == 2
+	
+	addi a2, a2, -4			# update temporario do eixo Y para cima
+	call checkCollision		# check de colisao superior equerda
+	addi a2, a2, 4			# cancela o update temporario do eixo Y
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveMul		# se ha colisao, pula para "moveMul"
+	
+	addi a2, a2, -4			# update temporario do eixo Y para cima
+	addi a1, a1, 12			# update temporario do eixo X para direita
+	call checkCollision		# check de colisao superior direito
+	addi a2, a2, 4			# cancela update temporario do eixo Y para cima
+	addi a1, a1, -12		# cancela update temporario do eixo X para direita
+	li t0, 0			# t0 = 0
+	beq t0, t1, moveMul		# se ha colisao, pula para "moveMul"
+	
+	li t0, 2
+	sw t0, 36(s1)
+	
+	addi a2, a2, -4			# update da posicao para 4 pixels para a cima
+	
+	li t1, 12
+	bge a2, t1, dontTeleportUpMul
+	li a2, 228
+	dontTeleportUpMul:
+	j mulHasMoved
+	
+moveMulDown:
+	addi a2, a2, 16			# update temporario do eixo Y para baixo
+	call checkCollision		# check de colisao inferior equerda
+	addi a2, a2, -16		# cancela o update temporario do eixo Y
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveMul		# se ha colisao, pula para "moveMul"
+	
+	addi a2, a2, 16			# update temporario do eixo Y para baixo
+	addi a1, a1, 12			# update temporario do eixo X para direita
+	call checkCollision		# check de colisao superior direito
+	addi a2, a2, -16		# cancela o update temporario do eixo Y 
+	addi a1, a1, -12		# cancela o update temporario do eixo X
+	li t0, 0			# t0 = 0
+	beq t0, t1, moveMul		# se ha colisao, pula para "moveMul"
+	
+	li t0, 3
+	sw t0, 36(s1)
+	
+	addi a2, a2, 4			# update da posicao para 4 pixels para a baixo
+	
+	li t1, 228
+	bne a2, t1, mulHasMoved
+	li a2, 12 
+	
+	
+mulHasMoved:
+	mv a0, s5				# a0 = spriteMuller
+	sw a1, 24(s1)				# posXMul = a1
+    	sw a2, 28(s1)				# posYMul = a2
+    	call print
+    	    	
+    	lw t1, 0(s11)
+    	lw t2, 4(s11)
+    	
+    	lw t3, 32(s1)
+    	bltz t3, gotze
+  	
+    	blt a1, t1, mulDontTouch  	
+    	addi t1, t1, 15	
+    	bgt a1, t1, mulDontTouch
+    	blt a2, t2, mulDontTouch	
+    	addi t2, t2, 15
+    	bgt a2, t2, mulDontTouch
+    	j mulTouch
+    	mulDontTouch:
+		lw t0, 40(s1)			# t0 = frameMulAnimacao
+		li t1, 264			# t1 = 264
+		mul t1, t1, t0			# t0 = +/- 264
+		add s5, s5, t1			# muda o sprite do Muller para ser animado
+		li t1, -1			# t1= -1
+		mul t0, t0, t1			# t0 *= -1
+		sw t0, 40(s1)			# guarda t0 em frameMulAnimacao
+gotze:
+
+	la a0, be
+	li a7, 4
+	ecall
 
 	li a0,76			# pausa de 76m segundos
 	li a7,32
@@ -736,7 +1131,7 @@ endGame:
 	ret
 restartGame:
 	mv ra, a6
-	addi ra, ra, -20
+	addi ra, ra, -24
 	ret
 	
 .include "src/print.s"

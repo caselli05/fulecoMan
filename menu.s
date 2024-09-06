@@ -1,5 +1,5 @@
 ###############
-# s0 =
+# s0 = vida
 # s1 = alemanhaInfo
 # s2 = endereco das notas
 # s3 = numero de notas
@@ -87,6 +87,7 @@ MUSIC2:	lw a0, 0(a5)
 gameOneStart:
     # setup dos sprites
         la s4, fixedBoateng0
+        la s5, fixedMuller0
 	la s8, map1Collision
 	la s9, map1
 	la s10, fulecoLeft0
@@ -96,12 +97,15 @@ gameOneStart:
 gameTwoStart:
     # setup dos sprites
     	la s4, fixedBoateng0
+    	la s5, fixedMuller0
 	la s8, map2Collision
 	la s9, map2
 	la s10, fulecoLeft0
 	call main
 	
 end:
+	#gameover
+	#you win
 	li a7, 10
 	ecall
 
