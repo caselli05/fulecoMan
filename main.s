@@ -1,5 +1,4 @@
 
-
 .data
 SCR:.string "SCORE:" 
 
@@ -8,7 +7,7 @@ SCR:.string "SCORE:"
 
         
 main:
-
+	
 	mv a6, ra			# a6 = return adress
     # print map in frame 0
     	mv a0, s9
@@ -42,14 +41,17 @@ main:
 	li a1, 144
 	li a2, 176
 	call print
-	
+		la a0, SCR
+        li a1, 7
+        li a2, 10
+        li a3, 0x00FF
+        li a4, 0
+        li a7,104
+        ecall
 	li a3, 0
-loopgame:
-
 	
-      
-        
-        
+loopgame:
+	
 	xori a3, a3, 1			# change frame 0 <--> 1
     # print map
     	mv a0, s9
@@ -62,15 +64,15 @@ loopgame:
     	li a1, 0
     	li a2, 0
     	call printProps 
+    
+    	
+
+	
+      
+        
+        
 
 input:
-	  la a0, SCR
-        li a1, 48
-        li a2, 4
-        li a3, 0x00FF
-        li a4, 0
-        li a7,104
-        ecall
         
         
 	lw a1, 0(s11)			# pega a posX e guarda em a1
@@ -82,11 +84,14 @@ input:
 	andi t0,t0,0x0001		# mascara o bit menos significativo
 	beq t0,zero, goLeft  		# Se nao ha tecla pressionada entao vai clickLeft
 	lw t2,4(t1)  			# le o valor da tecla tecla
-	sw t2,12(t1)  			# escreve a tecla pressionada no display    
+	sw t2,12(t1)			 # escreve a tecla pressionada no display  
+	j clickLeft
+ 			         
 	
 		
 		
 clickLeft:
+	
 	mv a0, s8			# a0 = testeCollision
 
 	li t1, 'a'
@@ -161,6 +166,10 @@ clickDown:
 	
 	li t1, 4
 	sw t1, 8(s11)			# muda o runningState para  4
+	
+	
+        
+
 	
 goLeft:
 	mv a0, s8
@@ -373,10 +382,11 @@ endGame:
 
 
 
+
 .data
 fulecoInfo: .word 144, 176, 0, 0, 0, 1, 0	# posX, posY, runningState, points, superState, frameAnimacao, leftOrRight
 space: .string " "
 .include "sprites/props/arquivos .data/dot.data"
 .include "sprites/props/arquivos .data/brazuca.data"
-
+.include "SYSTEMv21.s"
 	

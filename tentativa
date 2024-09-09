@@ -12,7 +12,6 @@ SCR: .string  	 "SCORE:"
 	li a7,104	#104: print string
 	ecall
 	
-
 	li a0,0		#imprimir o score
 	li a1,60
 	li a2, 10
