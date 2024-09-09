@@ -11,7 +11,6 @@
 # s9 = mapacColisao
 # s10 = sprite fuleco
 # s11 = fulecoInfo
-.include "MACROSv21.s"
 
 .text
 COMECO: 
