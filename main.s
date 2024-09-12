@@ -56,6 +56,18 @@ main:
 	sw t0, 36(s1)			# comeca o runningStateMul em 0(left)
 	sw t0, 40(s1)			# comeca o leftOrRightMul em 0(left)
 	sw t0, 44(s1)			# comeca o frameMul em 0
+
+    # Setup Gotze
+    	li t1, 154			# t1 = 154
+    	li t2, 128			# t2 = 128
+    	sw t1, 48(s1)			# posXGot = 134
+    	sw t2, 52(s1)			# posYGot = 128
+    	li t1, -230			
+    	sw t1, 56(s1)			# timeOutBoa = -230
+	li t0, 0			
+	sw t0, 60(s1)			# comeca o runningStateGot em 0(left)
+	sw t0, 64(s1)			# comeca o leftOrRightGot em 0(left)
+	sw t0, 68(s1)			# comeca o frameGot em 0
     	
 	
 	
@@ -344,6 +356,7 @@ dontAddPoints:
 	add s10, s10, t0		# s10 += 1056
 	add s4, s4, t0			# s4 += 1056
 	add s5, s5, t0
+	add s6, s6, t0
 dontChangeSuperSprite:
 	li t1, 132			# t1 = 132
 	sw t1, 16(s11)			# superState = 132
@@ -358,6 +371,7 @@ dontBeSuper:
 	sub s10, s10, t0		# s10 -= 1056
 	sub s4, s4, t0			# s4 -= 1056
 	sub s5, s5, t0
+	sub s6, s6, t0
 		
 isNotSuper:
     # Boateng
@@ -1115,10 +1129,391 @@ mulHasMoved:
 		mul t0, t0, t1			# t0 *= -1
 		sw t0, 40(s1)			# guarda t0 em frameMulAnimacao
 gotze:
+	lw a1, 48(s1)			# a1 = posXGot
+    	lw a2, 52(s1)			# a2 = posYGot
+    	
+    	lw t0, 56(s1)			# t0 = timeOutGot
+    	bgtz t0, dontStartGot		# if t0 > 0, pula pra dontStartGot
+    	addi t0, t0, 1			# t0 += 1
+    	sw t0, 56(s1)			# timeOutGot = t0
+    	bnez t0, gotHasMoved		# if t0 != 0, pula pra gotHasMoved
+    	li t1, 144			
+    	li t2, 96
+    	li t3, 1
+    	sw t1, 48(s1)			# posXGot = 144
+    	sw t2, 52(s1)			# posYGot = 96
+    	sw t3, 60(s1)			# runningStateGot = 1 (left)
+    	sw t3, 64(s1)			# frameGotAnimacao = 1
+dontStartGot:
+    	lw a1, 0(s1)			# a1 = posXBoa
+    	lw a2, 4(s1)			# a2 = posYBoa		
+    	lw t0, 0(s11)			# t0 = posXFuleco			
+    	lw t1, 4(s11)			# t1 = posYFuleco
+    	
+    	add t0, t0, t0			# t0 = 2*posXFul
+    	sub t0, t0, a1			# t0 = 2*posXFul - posXBoa
+    	add t1, t1, t1			# t1 = 2*posYFul
+    	sub t2, t1, a2			# t2 = 2*posYFul - posYBoa
+    	
+    	lw a1, 48(s1)			# a1 = posXgot
+    	lw a2, 52(s1)			# a2 = posYGot
+    	sub t0, t0, a1			# t0 = t0 - posXGot
+    	sub t2, t2, a2			# t2 = t2 - posYGot
 
-	la a0, be
-	li a7, 4
-	ecall
+    	mv a0, s8			# a0 = collisionMap
+    	
+    	lw t3, 60(s1)			# t3 = runningStateGot
+    	
+    	lw t4, 16(s11)
+	
+	bnez t4, gotIsAfraid
+	beqz t0, gotXZero
+	bgtz t0, gotXGreater
+	bltz t0, gotXLess
+	
+gotIsAfraid:
+	beqz t3, gotIsAfraidLeft		
+	addi t3, t3, -1
+	beqz t3, gotIsAfraidRight
+	addi t3, t3, -1
+	beqz t3, gotIsAfraidUp
+	j gotIsAfraidDown
+	gotIsAfraidLeft:
+		li a4, 177 		# a4 = 10.11.00.01 ( cima, baixo, esquerda, direita )
+		j moveGot
+	gotIsAfraidRight:	
+		li a4, 228 		# a4 = 11.10.01.00 ( baixo, cima, direita, esquerda )
+		j moveGot
+	gotIsAfraidUp:
+		li a4, 75 		# a4 = 01.00.10.11 ( direita, esquerda, cima, baixo )
+		j moveGot
+	gotIsAfraidDown:
+		li a4, 30		# a4 = 00.01.11.10 ( esquerda, direita, baixo, cima )
+		j moveGot
+		
+gotXZero:	# x == 0
+	beqz t3, gotXZeroLeft		
+	addi t3, t3, -1
+	beqz t3, gotXZeroRight
+	addi t3, t3, -1
+	beqz t3, gotXZeroUp
+	j gotXZeroDown
+	gotXZeroLeft:		# t3 == 0
+		beqz t2, gotTouch	# se y == 0, pula pra gotTouch
+		bltz t2, gotXZeroLeftUp
+		bgtz t2, gotXZeroLeftDown
+		gotXZeroLeftUp:		# y < 0
+			li a4, 141	# a4 = 10.00.11.01 ( cima, esquerda, baixo, direita )
+			j moveGot
+		gotXZeroLeftDown:	# y > 0
+			li a4, 201	# a4 = 11.00.10.01 ( baixo, esquerda, cima, direita )
+			j moveGot
+	gotXZeroRight:		# t3 == 1
+		beqz t2, gotTouch	# se y == 0, pula pra gotTouch
+		bltz t2, gotXZeroRightUp
+		bgtz t2, gotXZeroRightDown
+		gotXZeroRightUp:	# y < 0	
+			li a4, 156	# a4 = 10.01.11.00 ( cima, direita, baixo, esquerda )
+			j moveGot
+		gotXZeroRightDown:	# y > 0
+			li a4, 216	# a4 = 11.01.10.00 ( baixo, direita, cima, esquerda )
+			j moveGot
+	gotXZeroUp:		# t3 == 2
+		beqz t2, gotTouch	# se y == 0, pula pra gotTouch
+		bltz t2, gotXZeroUpUp
+		bgtz t2, gotXZeroUpDown
+		gotXZeroUpUp:	# y < 0
+			li a4, 147	# a4 = 10.01.00.11 ( cima, diretia, esquerda, baixo )
+			j moveGot
+		gotXZeroUpDown:	# y > 0
+			li a4, 27	# a4 = 00.01.10.11 ( esquerda, direita, cima, baixo )
+			j moveGot
+	 gotXZeroDown:
+	 	beqz t2, gotTouch	# se y == 0, pula pra gotTouch
+	 	bltz t2, gotXZeroDownUp
+	 	bgtz t2, gotXZeroDownDown
+	 	gotXZeroDownUp:	# y < 0
+	 		li a4, 78	# a4 = 01.00.11.10 ( direita, esquerda, baixo, cima )
+	 		j moveGot	
+	 	gotXZeroDownDown:# y >= 0
+	 		li a4, 198	# a4 = 11.00.01.10 ( baixo, esquerda, direita, cima )
+	 		j moveGot
+gotXGreater:	# x > 0 ( direita )
+	beqz t3, gotXGreaterLeft
+	addi t3, t3, -1
+	beqz t3, gotXGreaterRight
+	addi t3, t3, -1
+	beqz t3, gotXGreaterUp
+	j gotXGreaterDown
+	gotXGreaterLeft:	# t3 == 0
+		bltz t2, gotXGreaterLeftUp
+		bgez t2, gotXGreaterLeftDown
+		gotXGreaterLeftUp:	# y < 0
+			li a4, 141	# a4 = 10.00.11.01 ( cima, esqurda, baixo, direita )
+			j moveGot
+		gotXGreaterLeftDown:	# y >= 0
+			li a4, 201	# a4 = 11.00.10.01 ( baixo, esquerda, cima, direita )
+			j moveGot
+	gotXGreaterRight:	# t3 == 1
+		bltz t2, gotXGreaterRightUp
+		bgez t2, gotXGreaterRightDown
+		gotXGreaterRightUp:	# y < 0
+			li a4, 108	# a4 = 01.10.11.00 ( direita, cima, baixo, esquerda )
+			j moveGot
+		gotXGreaterRightDown:	
+			li a4, 120	# a4 = 01.11.10.00 ( direita, baixo, cima, esquerda )
+			j moveGot
+	gotXGreaterUp:		# t3 == 2
+		bltz t2, gotXGreaterUpUp
+		bgez t2, gotXGreaterUpDown
+		gotXGreaterUpUp:			
+			li a4, 99	# a4 = 01.10.00.11 ( direita, cima, esquerda, baixo ) 	
+			j moveGot
+		gotXGreaterUpDown:
+			li a4, 75	# a4 = 01.00.10.11 ( direita, esquerda, cima, baixo )
+			j moveGot
+	gotXGreaterDown:	# t3 == 3
+		bltz t2, gotXGreaterDownUp
+		bgez t3, gotXGreaterDownDown
+		gotXGreaterDownUp:
+			li a4, 78	# a4 = 01.00.11.10 ( direita, esquerda, baixo, cima )
+			j moveGot		
+		gotXGreaterDownDown:
+			li a4, 114	# a4 = 01.11.00.10 ( direita, baixo, esquerda, cima )
+			j moveGot
+
+gotXLess:	# x < 0 (esquerda)
+	beqz t3, gotXLessLeft	
+	addi t3, t3, -1
+	beqz t3, gotXLessRight
+	addi t3, t3, -1
+	beqz t3, gotXLessUp
+	addi t3, t3, -1
+	beqz t3, gotXLessDown
+	gotXLessLeft:		# t3 == 0
+		bltz t2, gotXLessLeftUp
+		bgez t2, gotXLessLeftDown
+		gotXLessLeftUp:		# y < 0
+			li a4, 45	# a4 = 00.10.11.01 ( esquerda, cima, baixo, direita )
+			j moveGot
+		gotXLessLeftDown:	# y >= 0
+			li a4, 57	# a4 = 00.11.10.01 ( esquerda, baixo, cima, direita )
+			j moveGot
+	gotXLessRight:		# t3 == 1
+		bltz t2, gotXLessRightUp
+		bgez t2, gotXLessRightDown
+		gotXLessRightUp:	# y < 0
+			li a4, 156	# a4 = 10.01.11.00 ( cima, direita, baixo, esquerda )
+			j moveGot
+		gotXLessRightDown:	# y >= 0
+			li a4, 216	# a4 = 11.01.10.00 ( baixo, direita, cima, esquerda )  
+			j moveGot
+	gotXLessUp:		# t3 == 2
+		bltz t2, gotXLessUpUp
+		bgez t2, gotXLessUpDown
+		gotXLessUpUp:		# y < 0
+			li a4, 39	# a4 = 00.10.01.11 ( esquerda, cima, direita, baixo )  
+			j moveGot
+		gotXLessUpDown:		# y >= 0
+			li a4, 27 	# a4 = 00.01.10.11 ( esquerda, direita, cima, baixo )
+			j moveGot
+	gotXLessDown:		# t3 == 3    	
+		bltz t2, gotXLessDownUp
+		bgez t2, gotXLessDownDown
+		gotXLessDownUp:		# y < 0
+			li a4, 30 	# a4 = 00.01.11.10 ( esquerda, direita, baixo, cima )
+		 	j moveGot
+		gotXLessDownDown: 	# y < 0
+			li a4, 54	# a4 = 00.11.01.10 ( esquerda, baixo, direita, cima )
+			j moveGot
+gotTouch:
+	lw t0, 16(s11)
+	
+	beqz t0, gotKillFuleco
+		li a1, 154			# posXGot = 154
+		li a2, 128			# posYGot = 128
+		li t1, -131
+		sw t1, 56(s1)			# gotTimeout = -131
+		li t0, 0
+		lw t1, 68(s1)			# t1 = LeftOrRightGot
+		beqz t1, gotIsDeadAndLeft	
+		addi s6, s6, -528		# s6 -= 528, se tiver pra direita 
+		sw t0, 68(s1)			# LeftOrRightGot = 0 = esquerda
+		gotIsDeadAndLeft:
+		lw t1, 64(s1)			# t1 = frameAnimacaoGot
+		bgtz t1, gotIsDeadAndFrame0	
+		addi s6, s6, -264		# s6 -= 264, se tiver no frame 1
+		sw zero, 64(s1)			# frameGot = 0
+		gotIsDeadAndFrame0:
+		j gotHasMoved
+
+	gotKillFuleco:			# superState == 0
+		addi s0, s0, -1
+		bgtz s0, restartGame  
+		li a7, 10
+		ecall
+		
+moveGot:
+	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
+	slli t1, t0, 6
+	sub a4, a4, t1
+	slli a4, a4, 2			# a4 = xx.xx.xx.00
+
+	mv a0, s8			# a0 = collisionMap
+	
+	bnez t0, moveGotRight		# t0 == 0
+	addi a1, a1, -4			# update temporario da posicao para 4 pixels para esquerda
+	call checkCollision		# check da colisao superior esquerda
+	li t0, 0			# t0 = 0
+	addi a1, a1, 4			# cancela o update temporario do eixo X
+	beq t1, t0, moveGot		# se ha colisao, pula para "moveGot"
+	
+	addi a1, a1, -4			# update da posicao para 4 pixels para esquerda
+	addi a2, a2, 15			# update da posicao para 15 pixels para baixo
+	call checkCollision		# check da colisao inferior esquerda
+	li t0, 0			# t0 = 0
+	addi a1, a1, 4			# cancela o update temporario do eixo X
+	addi a2, a2, -15		# cancela o update temporario do eixo Y
+	beq t1, t0, moveGot		# se ha colisao, pula para "moveGot"
+	
+	li t0, 0			# t0 = 0
+	lw t1, 68(s1)			# t1 = LeftOrRightGot
+	beq t0, t1, gotIsLeft	
+	addi s6, s6, -528		# s6 -= 528, se tiver pra direita
+	sw t0, 68(s1)			# LeftOrRightGot = 0 = esquerda
+	gotIsLeft:
+	sw t0, 60(s1)			# RunningStateGot = 0 = equerda
+	
+	addi a1, a1, -4			# update da posicao para 4 pixels para a esquerda
+	
+	li t1, 0			# t1 = 0
+	bne a1, t1, dontTeleportLeftGot	# se posX != 0, pula pra "dontTeleportLeftGot"
+	li t1, 0			# t1 = 0
+	lw t0, 60(s1)			# t0 = runningStateGot
+	bne t0, t1, dontTeleportLeftGot	# se movState == right, pula pra "dontTeleportLeftGot" 
+	li a1, 288			# usa o teleporte da esquerda
+	dontTeleportLeftGot:
+	j gotHasMoved
+	
+moveGotRight:
+	li t1, 1
+	bne t0, t1, moveGotUp		# t0 == 1
+	
+	addi a1, a1, 16			# update temporario do eixo X para a direita 
+	call checkCollision		# check de colisao superior direita
+	addi a1, a1, -16		# cancela o update temporario do eixo X para a direita
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveGot		# se ha colisao, pula para "moveGot"
+	
+	addi a1, a1, 16			# update temporario do eixo X para a diereita
+	addi a2, a2, 15			# update temporario do eixo Y para baixo
+	call checkCollision		# check de colisao inferior direita
+	addi a1, a1, -16		# cancela o update temporario do eixo X para a direita
+	addi a2, a2, -15		# cancela o update temporario do eixo Y para a esquerda
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveGot		# se ha colisao, pula para "moveGot"
+	
+	li t0, 1			# t0 = 1
+	lw t1, 68(s1)			# t1 = gotLeftOrRight
+	beq t0, t1, gotIsRight	 
+	addi s6, s6, 528		# s6 += 528, se estiver pra esquerda
+	sw t0, 68(s1)			# gotLeftOrRight = 1 = direita
+	gotIsRight:
+	sw t0, 60(s1)			# gotRunningState = 1 = direita
+	
+	addi a1, a1, 4			# update da posicao para 4 pixels para a direita
+	
+	li t1, 300			# t1 = 300
+	bne a1, t1, dontTeleportRightGot# se posX != 300, pula pra "dontTeleportRightGot"
+	li t1, 1
+	lw t0, 60(s1)			# t0 = runningStateGot
+	bne t0, t1, dontTeleportRightGot# se movState == left, pula pra "dontTeleportRightGot"
+	li a1, 0			# usa o teleporte da direita
+	dontTeleportRightGot:
+	j gotHasMoved
+	
+moveGotUp:
+	li t1, 2
+	bne t0, t1, moveGotDown		# t0 == 2
+	
+	addi a2, a2, -4			# update temporario do eixo Y para cima
+	call checkCollision		# check de colisao superior equerda
+	addi a2, a2, 4			# cancela o update temporario do eixo Y
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveGotUp		# se ha colisao, pula para "moveGotUp"
+	
+	addi a2, a2, -4			# update temporario do eixo Y para cima
+	addi a1, a1, 12			# update temporario do eixo X para direita
+	call checkCollision		# check de colisao superior direito
+	addi a2, a2, 4			# cancela update temporario do eixo Y para cima
+	addi a1, a1, -12		# cancela update temporario do eixo X para direita
+	li t0, 0			# t0 = 0
+	beq t0, t1, moveGotUp		# se ha colisao, pula para "moveGotUp"
+	
+	li t0, 2
+	sw t0, 60(s1)			# runningStateGot = 2 = up
+	
+	addi a2, a2, -4			# update da posicao para 4 pixels para a cima
+	
+	li t1, 12
+	bge a2, t1, dontTeleportUpGot
+	li a2, 228
+	dontTeleportUpGot:
+	j gotHasMoved
+	
+moveGotDown:
+	addi a2, a2, 16			# update temporario do eixo Y para baixo
+	call checkCollision		# check de colisao inferior equerda
+	addi a2, a2, -16		# cancela o update temporario do eixo Y
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveGot		# se ha colisao, pula para "moveGot"
+	
+	addi a2, a2, 16			# update temporario do eixo Y para baixo
+	addi a1, a1, 12			# update temporario do eixo X para direita
+	call checkCollision		# check de colisao superior direito
+	addi a2, a2, -16		# cancela o update temporario do eixo Y 
+	addi a1, a1, -12		# cancela o update temporario do eixo X
+	li t0, 0			# t0 = 0
+	beq t0, t1, moveGot		# se ha colisao, pula para "moveGot"
+	
+	li t0, 3
+	sw t0, 60(s1)
+	
+	addi a2, a2, 4			# update da posicao para 4 pixels para a baixo
+	
+	li t1, 228
+	bne a2, t1, gotHasMoved
+	li a2, 12 
+	
+gotHasMoved:
+	mv a0, s6				# a0 = spriteGotze
+	sw a1, 48(s1)				# posXGot = a1
+    	sw a2, 52(s1)				# posYgot = a2
+    	call print
+    	
+    	lw t1, 0(s11)
+    	lw t2, 4(s11)
+    	
+    	lw t3, 56(s1)				# t3 = timeOutGot
+    	bltz t3, kross
+  	
+    	blt a1, t1, gotDontTouch  	
+    	addi t1, t1, 15	
+    	bgt a1, t1, gotDontTouch
+    	blt a2, t2, gotDontTouch	
+    	addi t2, t2, 15
+    	bgt a2, t2, gotDontTouch
+    	j gotTouch
+    	gotDontTouch:
+		lw t0, 64(s1)			# t0 = frameAnimacaoGot
+		li t1, 264			# t1 = 264
+		mul t1, t1, t0			# t0 = +/- 264
+		add s6, s6, t1			# muda o sprite do Gotze para ser animado
+		li t1, -1			# t1= -1
+		mul t0, t0, t1			# t0 *= -1
+		sw t0, 64(s1)			# guarda t0 em frameAnimacaoGot
+
+kross:
 
 	li a0,76			# pausa de 76m segundos
 	li a7,32
@@ -1131,7 +1526,7 @@ endGame:
 	ret
 restartGame:
 	mv ra, a6
-	addi ra, ra, -24
+	addi ra, ra, -28
 	ret
 	
 .include "src/print.s"
@@ -1140,9 +1535,10 @@ restartGame:
 
 .data
 fulecoInfo: .word 144, 176, 0, 0, 0, 1, 0	# posX, posY, runningState, points, superState, frameAnimacao, leftOrRight
-germanyInfo: .word 114, 128, -130, 0, 0, 0, 134, 128, -180, 0, 0, 0 	# 154, 128, 174, 128
+germanyInfo: .word 114, 128, -130, 0, 0, 0, 134, 128, -180, 0, 0, 0, 154, 128, -230, 0, 0, 0  	# 174, 128
 	# posXBoa(0), posYBoa(4), timeOutBoa(8), runningStateBoa(12), frameAnimacaoBoa(16), leftorRightBoa(20)
 	# posXMul(24), posYMul(28), timeOutMul(32), runningStateMul(36), frameAnimacaoMul(40), leftOrRightMul(44)
+	# posXGot(48), posYGot(52), timeOutGot(56), runningStateGot(60), frameAnimacaoGot(64), leftOrRightGot(68)
 									
 space: .string " "
 ae: .string "moveu\n"
