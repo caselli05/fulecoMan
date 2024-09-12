@@ -602,8 +602,7 @@ boaTouch:
 	boaKillFuleco:			# superState == 0
 		addi s0, s0, -1
 		bgtz s0, restartGame  
-		li a7, 10
-		ecall
+		j gameOverScreen
 		
 moveBoa:
 	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
@@ -978,8 +977,7 @@ mulTouch:
 	mulKillFuleco:			# superState == 0
 		addi s0, s0, -1
 		bgtz s0, restartGame  
-		li a7, 10
-		ecall		
+		j gameOverScreen		
 
 moveMul:
 	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
@@ -1363,8 +1361,7 @@ gotTouch:
 	gotKillFuleco:			# superState == 0
 		addi s0, s0, -1
 		bgtz s0, restartGame  
-		li a7, 10
-		ecall
+		j gameOverScreen
 		
 moveGot:
 	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
@@ -1747,8 +1744,7 @@ kroTouch:
 	kroKillFuleco:			# superState == 0
 		addi s0, s0, -1
 		bgtz s0, restartGame  
-		li a7, 10
-		ecall		
+		j gameOverScreen		
 
 moveKro:
 	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
@@ -1926,9 +1922,10 @@ restartGame:
 	addi ra, ra, -32
 	ret
 	
-.include "src/print.s"
+
 .include "src/checkCollision.s"
 .include "src/printProps.s"
+.include "src/print.s"
 
 .data
 fulecoInfo: .word 144, 176, 0, 0, 0, 1, 0	# posX, posY, runningState, points, superState, frameAnimacao, leftOrRight
