@@ -5,8 +5,8 @@
 # s3 = numero de notas
 # s4 = sprite Boateng
 # s5 = sprite Gotze
-# s6 = sprite Kross 
-# s7 = sprite Muller
+# s6 = sprite Muller 
+# s7 = sprite Kross
 # s8 = mapa
 # s9 = mapacColisao
 # s10 = sprite fuleco
@@ -88,6 +88,7 @@ gameOneStart:
     # setup dos sprites
         la s4, fixedBoateng0
         la s5, fixedMuller0
+        la s6, fixedGotze0
 	la s8, map1Collision
 	la s9, map1
 	la s10, fulecoLeft0
@@ -98,6 +99,7 @@ gameTwoStart:
     # setup dos sprites
     	la s4, fixedBoateng0
     	la s5, fixedMuller0
+    	la s6, fixedGotze0
 	la s8, map2Collision
 	la s9, map2
 	la s10, fulecoLeft0
@@ -154,6 +156,16 @@ NOTAS: 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 5
 .include "sprites/alemanha/arquivos .data/MullerLeft1Inv.data" 		# inclui o .data com o Boateng Left 1 Inv
 .include "sprites/alemanha/arquivos .data/MullerRight0Inv.data"		# inclui o .data com o Boateng Right 0 Inv
 .include "sprites/alemanha/arquivos .data/MullerRight1Inv.data"		# inclui o .data com o Boateng Right 1 Inv
+    # Sprites do Gotze
+.include "sprites/alemanha/arquivos .data/GotzeLeft0.data"		# inclui o .data com o Gotze Left 0
+.include "sprites/alemanha/arquivos .data/GotzeLeft1.data" 		# inclui o .data com o Gotze Left 1
+.include "sprites/alemanha/arquivos .data/GotzeRight0.data"		# inclui o .data com o Gotze Right 0
+.include "sprites/alemanha/arquivos .data/GotzeRight1.data"		# inclui o .data com o Gotze Right 1
+
+.include "sprites/alemanha/arquivos .data/GotzeLeft0Inv.data"		# inclui o .data com o Gotze Left 0 Inv
+.include "sprites/alemanha/arquivos .data/GotzeLeft1Inv.data" 		# inclui o .data com o Gotze Left 1 Inv
+.include "sprites/alemanha/arquivos .data/GotzeRight0Inv.data"		# inclui o .data com o Gotze Right 0 Inv
+.include "sprites/alemanha/arquivos .data/GotzeRight1Inv.data"		# inclui o .data com o Gotze Right 1 Inv
 
 
 
