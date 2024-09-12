@@ -44,10 +44,7 @@ LOOP: 	beq t3,t4,FORA		# Coloca a imagem no Frame0
 	addi t3,t3,1
 	j LOOP	
 	
-FORA:	li s0,0xFF200604	# Escolhe o Frame 0 ou 1
-	li t2,0			# inicio Frame 0
-
-	sw t2,0(s0)		# seleciona a Frame t2
+FORA:	
 	li t3, 49		# t3 = '1'
 	li t4, '2'		# t4 = '2'
 	
@@ -106,10 +103,38 @@ gameTwoStart:
 	la s9, map2
 	la s10, fulecoLeft0
 	call main
-	
+
+youWinScreen:	
+	la a0, youWin
+	li a1, 0
+	li a2, 0
+	li a3, 0
+	call print
+	li a3, 1
+	call print
+	j typeEnd
+
+gameOverScreen:
+	la a0, gameOver
+	li a1, 0
+	li a2, 0
+	li a3, 0
+	call print
+	li a3, 1
+	call print
+	j typeEnd
+
+typeEnd:
+	li t3, 49		# t3 = '1'
+	li t1,0xFF200000	# carrega o endereco de controle do KDMMIO
+	lw t0,0(t1)		# Le bit de Controle Teclado
+	andi t0,t0,0x0001	# mascara o bit menos significativo
+   	beq t0,zero, typeEnd   	# Se nao ha tecla pressionada entao vai para typeEnd
+  	lw t2,4(t1)  		# le o valor da tecla tecla
+	sw t2,12(t1)  		# escreve a tecla pressionada no display
+	beq t2, t3, end		# vai pro mapa 1
+
 end:
-	#gameover
-	#you win
 	li a7, 10
 	ecall
 
@@ -122,6 +147,8 @@ NUM: .word 160
 NOTAS: 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 55, 200, 53, 200, 52, 200, 50, 200, 48, 200, 50, 200, 52, 200, 55, 200, 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 62, 200, 59, 200, 57, 200, 55, 200, 60, 200, 55, 200, 59, 200, 55, 200, 64, 200, 52, 200, 50, 200, 60, 200, 48, 200, 47, 200, 60, 200, 50, 200, 65, 200, 53, 200, 52, 200, 60, 200, 50, 200, 48, 200, 60, 200, 52, 200, 67, 200, 55, 200, 52, 200, 65, 200, 50, 200, 48, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 55, 200, 60, 200, 55, 200, 59, 200, 55, 200, 64, 200, 52, 200, 50, 200, 60, 200, 48, 200, 47, 200, 60, 200, 50, 200, 65, 200, 53, 200, 52, 200, 60, 200, 50, 200, 48, 200, 60, 200, 52, 200, 67, 200, 55, 200, 52, 200, 65, 200, 50, 200, 48, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 64, 200, 62, 200, 55, 200, 60, 200, 59, 200, 64, 200, 52, 200, 50, 200, 52, 200, 55, 200, 52, 200, 72, 200, 55, 200, 69, 200, 57, 200, 55, 200, 69, 200, 69, 200, 67, 200, 64, 200, 62, 200, 64, 200, 52, 200, 60, 200, 48, 200, 62, 200, 50, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 55, 200, 53, 200, 52, 200, 50, 200, 48, 200, 64, 200, 52, 200, 50, 200, 52, 200, 55, 200, 52, 200, 72, 200, 55, 200, 69, 200, 57, 200, 55, 200, 69, 200, 69, 200, 67, 200, 64, 200, 62, 200, 64, 200, 52, 200, 60, 200, 48, 200, 62, 200, 50, 200, 64, 200, 52, 200, 62, 200, 59, 200, 57, 200, 64, 200, 62, 200, 50, 200, 60, 200, 59, 200 
 
 .include "sprites/Menu/arquivos .data/menu.data"			# inclui o .data com a menu
+.include "sprites/Menu/arquivos .data/gameOver.data"			# inclui o .data com a gameOver
+.include "sprites/Menu/arquivos .data/youWin.data"			# inclui o .data com a youWin
     # Mapa 1
 .include "sprites/Mapas/arquivos .data/map1.data"			# inclui o .data com o mapa 1
 .include "sprites/Mapas/arquivos .data/map1Collision.data"		# inclui o .data com as colisoes mapa 1
