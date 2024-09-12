@@ -133,6 +133,7 @@ typeEnd:
   	lw t2,4(t1)  		# le o valor da tecla tecla
 	sw t2,12(t1)  		# escreve a tecla pressionada no display
 	beq t2, t3, end		# vai pro mapa 1
+	j typeEnd
 
 end:
 	li a7, 10
