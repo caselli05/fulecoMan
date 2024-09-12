@@ -32,15 +32,16 @@ main:
 	li a2, 176
 	call print
 	
+	la s1, germanyInfo		# s1 = germanyInfo
+	
     # setup Boateng
-    	la s1, germanyInfo		# s1 = germanyInfo			114, 128, -130, 0, 0, 0
     	li t1, 114			# t1 = 144
     	li t2, 128			# t2 = 128
     	sw t1, 0(s1)			# posXBoa = 144
     	sw t2, 4(s1)			# posYBoa = 128
     	li t1, -130			
     	sw t1, 8(s1)			# timeOutBoa = -130
-	li t0, 0			
+	li t0, 0	
 	sw t0, 12(s1)			# comeca o runningStateBoa em 0(left)
 	sw t0, 16(s1)			# comeca o leftOrRightBoa em 0(left)
 	sw t0, 20(s1)			# comeca o frameBoa em 0
@@ -52,7 +53,7 @@ main:
     	sw t2, 28(s1)			# posYMul = 128
     	li t1, -180			
     	sw t1, 32(s1)			# timeOutBoa = -180
-	li t0, 0			
+	li t0, 0										
 	sw t0, 36(s1)			# comeca o runningStateMul em 0(left)
 	sw t0, 40(s1)			# comeca o leftOrRightMul em 0(left)
 	sw t0, 44(s1)			# comeca o frameMul em 0
@@ -63,13 +64,23 @@ main:
     	sw t1, 48(s1)			# posXGot = 134
     	sw t2, 52(s1)			# posYGot = 128
     	li t1, -230			
-    	sw t1, 56(s1)			# timeOutBoa = -230
-	li t0, 0			
+    	sw t1, 56(s1)			# timeOutGot = -230
+	li t0, 0										
 	sw t0, 60(s1)			# comeca o runningStateGot em 0(left)
 	sw t0, 64(s1)			# comeca o leftOrRightGot em 0(left)
 	sw t0, 68(s1)			# comeca o frameGot em 0
-    	
 	
+    # Setup Kross
+    	li t1, 174			# t1 = 174
+    	li t2, 128			# t2 = 128
+    	sw t1, 72(s1)			# posXKro = 134
+    	sw t2, 76(s1)			# posYKro = 128
+    	li t1, -280			
+    	sw t1, 80(s1)			# timeOutKro = -230
+	li t0, 0									
+	sw t0, 84(s1)			# comeca o runningStateKro em 0(left)
+	sw t0, 88(s1)			# comeca o leftOrRightKroem 0(left)
+	sw t0, 92(s1)			# comeca o frameKro em 0	
 	
 	li a3, 0
 loopgame:
@@ -357,6 +368,7 @@ dontAddPoints:
 	add s4, s4, t0			# s4 += 1056
 	add s5, s5, t0
 	add s6, s6, t0
+	add s7, s7, t0
 dontChangeSuperSprite:
 	li t1, 132			# t1 = 132
 	sw t1, 16(s11)			# superState = 132
@@ -372,6 +384,7 @@ dontBeSuper:
 	sub s4, s4, t0			# s4 -= 1056
 	sub s5, s5, t0
 	sub s6, s6, t0
+	sub s7, s7, t0
 		
 isNotSuper:
     # Boateng
@@ -783,7 +796,7 @@ muller:
     	
     	lw t4, 16(s11)			# t4 = superState
     	
-	#bnez t4, mulIsAfraid
+	bnez t4, mulIsAfraid
 	beqz t2, mulYZero
 	bgtz t2, mulYGreater
 	bltz t2, mulYLess
@@ -957,7 +970,7 @@ mulTouch:
 		mulIsDeadAndLeft:
 		lw t1, 40(s1)			# t1 = frameMul
 		bgtz t1, mulIsDeadAndFrame0	
-		addi s5, s5, -264		# s4 -= 264, se tiver no frame 1
+		addi s5, s5, -264		# s5 -= 264, se tiver no frame 1
 		sw zero, 40(s1)			# frameMul = 0
 		mulIsDeadAndFrame0:
 		j mulHasMoved
@@ -1514,7 +1527,391 @@ gotHasMoved:
 		sw t0, 64(s1)			# guarda t0 em frameAnimacaoGot
 
 kross:
+	lw a1, 72(s1)			# a1 = posXKross
+	lw a2, 76(s1)			# a2 = posYKross
+	
+	lw t0, 80(s1)			# t0 = timeOutKro
+	bgtz t0, dontStartKro		
+	addi t0, t0, 1
+	sw t0, 80(s1)
+	bnez t0, kroHasMoved
+	li t1, 144			
+    	li t2, 96
+    	li t3, 1
+    	sw t1, 72(s1)			# posXKro = 144
+    	sw t2, 76(s1)			# posYKro = 96
+    	sw t3, 84(s1)			# runningStateKro = 1 (left)
+    	sw t3, 88(s1)			# frameAnimacaoKro = 1
+	dontStartKro:
+	lw a1, 24(s1)			# a1 = posXMul
+    	lw a2, 28(s1)			# a2 = posYMul		
+    	lw t0, 0(s11)			# t0 = posXFuleco			
+    	lw t1, 4(s11)			# t1 = posYFuleco
+    	
+    	add t0, t0, t0			# t0 = 2*posXFul
+    	sub t0, t0, a1			# t0 = 2*posXFul - posXBoa
+    	add t1, t1, t1			# t1 = 2*posYFul
+    	sub t2, t1, a2			# t2 = 2*posYFul - posYBoa
 
+    	
+    	lw a1, 72(s1)			# a1 = posXKro
+	lw a2, 76(s1)			# a2 = posYKro
+    	sub t0, t0, a1			# t0 = t0 - posXGot
+    	sub t2, t2, a2			# t2 = t2 - posYGot	
+
+    	mv a0, s8			# a0 = collisionMap
+    	
+    	lw t3, 84(s1)			# t3 = runningStateKro
+    	
+    	lw t4, 16(s11)			# t4 = superState
+    	
+	bnez t4, kroIsAfraid
+	beqz t2, kroYZero
+	bgtz t2, kroYGreater
+	bltz t2, kroYLess
+	
+kroIsAfraid:
+	beqz t3, kroIsAfraidLeft		
+	addi t3, t3, -1
+	beqz t3, kroIsAfraidRight
+	addi t3, t3, -1
+	beqz t3, kroIsAfraidUp
+	j kroIsAfraidDown
+	kroIsAfraidLeft:
+		li a4, 177 		# a4 = 10.11.00.01 ( cima, baixo, esquerda, direita )
+		j moveKro
+	kroIsAfraidRight:	
+		li a4, 228 		# a4 = 11.10.01.00 ( baixo, cima, direita, esquerda )
+		j moveKro
+	kroIsAfraidUp:
+		li a4, 75 		# a4 = 01.00.10.11 ( direita, esquerda, cima, baixo )
+		j moveKro
+	kroIsAfraidDown:
+		li a4, 30		# a4 = 00.01.11.10 ( esquerda, direita, baixo, cima )
+		j moveKro
+		
+kroYZero:
+	beqz t3, kroYZeroLeft		
+	addi t3, t3, -1
+	beqz t3, kroYZeroRight
+	addi t3, t3, -1
+	beqz t3, kroYZeroUp
+	j kroYZeroDown
+	kroYZeroLeft:	 
+		bltz t0, kroYZeroLeftLeft
+		beqz t0, kroTouch
+		bgtz t0, kroYZeroLeftRight
+		kroYZeroLeftLeft:
+			li a4, 45		# a4 = 00.10.11.01 ( esquerda, cima, baixo, direita ) 
+			j moveKro
+		kroYZeroLeftRight:
+			li a4, 225		# a4 = 11.10.00.01 ( baixo, cima, esquerda, direita ) 
+			j moveKro
+	kroYZeroRight:
+		bltz t0, kroYZeroRightLeft
+		beqz t0, kroTouch
+		bgtz t0, kroYZeroRightRight
+		kroYZeroRightLeft:
+			li a4, 180 		# a4 = 10.11.01.00 ( cima, baixo, direita, esquerda )
+			j moveKro
+		kroYZeroRightRight:
+			li a4, 120 		# a4 = 01.11.10.00 ( direita, baixo, cima, esquerda )
+			j moveKro
+	kroYZeroUp:
+		bltz t0, kroYZeroUpLeft
+		beqz t0, kroTouch
+		bgtz t0, kroYZeroUpRight
+		kroYZeroUpLeft:
+			li a4, 39		# a4 = 00.10.01.11 ( esquerda, cima, direita, baixo )
+			j moveKro
+		kroYZeroUpRight:
+			li a4, 99		# a4 = 01.10.00.11 ( direita, cima, esquerda, baixo )
+			j moveKro
+	kroYZeroDown:
+		bltz t0, kroYZeroDownLeft
+		beqz t0, kroTouch
+		bgtz t0, kroYZeroDownRight
+		kroYZeroDownLeft:
+			li a4, 54 		# a4 = 00.11.01.10 ( esquerda, baixo, direita, cima )
+			j moveKro
+		kroYZeroDownRight:
+			li a4, 114		# a4 = 01.11.00.10 ( direita, baixo, esquerda, cima )
+			j moveKro
+kroYGreater:
+	beqz t3, kroYGreaterLeft		
+	addi t3, t3, -1
+	beqz t3, kroYGreaterRight
+	addi t3, t3, -1
+	beqz t3, kroYGreaterUp
+	j kroYGreaterDown
+	kroYGreaterLeft:
+		bltz t0, kroYGreaterLeftLeft
+		bgez t0, kroYGreaterLeftRight
+		kroYGreaterLeftLeft:
+			li a4, 201 		# a4 = 11.00.10.01 ( baixo, esquerda, cima, direita )
+			j moveKro
+		kroYGreaterLeftRight:
+			li a4, 225		# a4 = 11.10.00.01 ( baixo, cima, esquerda, direita )
+			j moveKro
+	kroYGreaterRight:
+		bltz t0, kroYGreaterRightLeft
+		bgez t0, kroYGreaterRightRight
+		kroYGreaterRightLeft:
+			li a4, 228 		# a4 = 11.10.01.00 ( baixo, cima, direita, esquerda )
+			j moveKro
+		kroYGreaterRightRight:
+			li a4, 216		# a4 = 11.01.10.00 ( baixo, direita, cima, esquerda )
+			j moveKro
+	kroYGreaterUp:
+		bltz t0, kroYGreaterUpLeft
+		bgez t0, kroYGreaterUpRight
+		kroYGreaterUpLeft:
+			li a4, 27		# a4 = 00.01.10.11 ( esquerda, direita, cima, baixo )
+			j moveKro
+		kroYGreaterUpRight:
+			li a4, 75		# a4 = 01.00.10.11 ( direita, esquerda, cima, baixo ) 
+			j moveKro
+	kroYGreaterDown:
+		bltz t0, kroYGreaterDownLeft
+		bgtz t0, kroYGreaterDownRight
+		kroYGreaterDownLeft:
+			li a4, 198 		# a4 = 11.00.01.10 ( baixo, esquerda, direita, cima ) 
+			j moveKro
+		kroYGreaterDownRight:
+			li a4, 210 		# a4 = 11.01.00.10 ( baixo, direita, esquerda, cima )
+			j moveKro
+kroYLess:
+	beqz t3, kroYLessLeft		
+	addi t3, t3, -1
+	beqz t3, kroYLessRight
+	addi t3, t3, -1
+	beqz t3, kroYLessUp
+	j kroYLessDown
+	kroYLessLeft:
+		bltz t0, kroYLessLeftLeft
+		bgez t0, kroYLessLeftRight
+		kroYLessLeftLeft:
+			li a4, 141 		# a4 = 10.00.11.01 ( cima, esquerda, baixo, direita )
+			j moveKro
+		kroYLessLeftRight:
+			li a4, 177		# a4 = 10.11.00.01 ( cima, baixo, esquerda, direita )
+			j moveKro
+	kroYLessRight:
+		bltz t0, kroYLessRightLeft
+		bgez t0, kroYLessRightRight
+		kroYLessRightLeft:
+			li a4, 180		# a4 = 10.11.01.00 ( cima, baixo, direita, esquerda )
+			j moveKro
+		kroYLessRightRight:
+			li a4, 156		# a4 = 10.01.11.00 ( cima, direita, baixo, esquerda )
+			j moveKro
+	kroYLessUp: 
+		bltz t0, kroYLessUpLeft
+		bgez t0, kroYLessUpRight
+		kroYLessUpLeft:
+			li a4, 135		# a4 = 10.00.01.11 ( cima, esquerda, direita, baixo )
+			j moveKro
+		kroYLessUpRight:
+			li a4, 147 		# a4 = 10.01.00.11 ( cima, direita, esquerda, baixo )
+			j moveKro
+	kroYLessDown:
+		bltz t0, kroYLessDownLeft
+		bgez t0, kroYLessDownRight
+		kroYLessDownLeft:
+			li a4, 30		# a4 = 00.01.11.10 ( esquerda, direita, baixo, cima )
+			j moveKro
+		kroYLessDownRight:
+			li a4, 78 		# a4 = 01.00.11.10 ( direita, esquerda, baixo, cima )
+			j moveKro
+kroTouch:	
+	lw t0, 16(s11)
+	
+	beqz t0, kroKillFuleco
+		li a1, 174			# posXKro = 174
+		li a2, 128			# posYKro = 128
+		li t1, -131
+		sw t1, 80(s1)			# timeOutKro = -131
+		li t0, 0
+		lw t1, 92(s1)			# t1 = leftOrRightKro
+		beqz t1, kroIsDeadAndLeft	
+		addi s7, s7, -528		# s7 -= 528, se tiver pra direita 
+		sw t0, 92(s1)			# leftOrRightKro = 0 = esquerda
+		kroIsDeadAndLeft:
+		lw t1, 88(s1)			# t1 = frameAnimacaoKro
+		bgtz t1, kroIsDeadAndFrame0	
+		addi s7, s7, -264		# s7 -= 264, se tiver no frame 1
+		sw zero, 88(s1)			# frameAnimacaoKro = 0
+		kroIsDeadAndFrame0:
+		j kroHasMoved
+
+	kroKillFuleco:			# superState == 0
+		addi s0, s0, -1
+		bgtz s0, restartGame  
+		li a7, 10
+		ecall		
+
+moveKro:
+	srli t0, a4, 6			# t0 = ultimos 2 bits d a4 (xx.--.--.--)
+	slli t1, t0, 6
+	sub a4, a4, t1
+	slli a4, a4, 2			# a4 = xx.xx.xx.00
+
+	mv a0, s8			# a0 = collisionMap
+	
+	bnez t0, moveKroRight		# t0 == 0
+	addi a1, a1, -4			# update temporario da posicao para 4 pixels para esquerda
+	call checkCollision		# check da colisao superior esquerda
+	li t0, 0			# t0 = 0
+	addi a1, a1, 4			# cancela o update temporario do eixo X
+	beq t1, t0, moveKro		# se ha colisao, pula para "moveKro"
+	
+	addi a1, a1, -4			# update da posicao para 4 pixels para esquerda
+	addi a2, a2, 15			# update da posicao para 15 pixels para baixo
+	call checkCollision		# check da colisao inferior esquerda
+	li t0, 0			# t0 = 0
+	addi a1, a1, 4			# cancela o update temporario do eixo X
+	addi a2, a2, -15		# cancela o update temporario do eixo Y
+	beq t1, t0, moveKro		# se ha colisao, pula para "moveKro"
+	
+	li t0, 0			# t0 = 0
+	lw t1, 92(s1)			# t1 = leftOrRightKro
+	beq t0, t1, kroIsLeft	
+	addi s7, s7, -528		# s7 -= 528, se tiver pra direita
+	sw t0, 92(s1)			# leftOrRightKro = 0 = esquerda
+	kroIsLeft:
+	sw t0, 84(s1)			# runningStateKro = 0 = equerda
+	
+	addi a1, a1, -4			# update da posicao para 4 pixels para a esquerda
+	
+	li t1, 0			# t1 = 0
+	bne a1, t1, dontTeleportLeftKro	# se posX != 0, pula pra "dontTeleportLeftKro"
+	li t1, 0			# t1 = 0
+	lw t0, 84(s1)
+	bne t0, t1, dontTeleportLeftKro	# se movState == right, pula pra "dontTeleportLeftKro" 
+	li a1, 288			# usa o teleporte da esquerda
+	dontTeleportLeftKro:
+	j kroHasMoved
+	
+moveKroRight:
+	li t1, 1
+	bne t0, t1, moveKroUp		# t0 == 1
+	
+	addi a1, a1, 16			# update temporario do eixo X para a direita 
+	call checkCollision		# check de colisao superior direita
+	addi a1, a1, -16		# cancela o update temporario do eixo X para a direita
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveKro		# se ha colisao, pula para "moveKro"
+	
+	addi a1, a1, 16			# update temporario do eixo X para a diereita
+	addi a2, a2, 15			# update temporario do eixo Y para baixo
+	call checkCollision		# check de colisao inferior direita
+	addi a1, a1, -16		# cancela o update temporario do eixo X para a direita
+	addi a2, a2, -15		# cancela o update temporario do eixo Y para a esquerda
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveKro		# se ha colisao, pula para "moveKro"
+	
+	li t0, 1			# t0 = 1
+	lw t1, 92(s1)			# t1 = leftOrRightKro
+	beq t0, t1, kroIsRight	 
+	addi s7, s7, 528		# s7 += 528, se estiver pra esquerda
+	sw t0, 92(s1)			# leftOrRightKro = 1 = direita
+	kroIsRight:
+	sw t0, 84(s1)			# runningStateKro = 1 = direita
+	
+	addi a1, a1, 4			# update da posicao para 4 pixels para a direita
+	
+	li t1, 300			# t1 = 300
+	bne a1, t1, dontTeleportRightKro# se posX != 300, pula pra "dontTeleportRightKro"
+	li t1, 1
+	lw t0, 84(s1)
+	bne t0, t1, dontTeleportRightKro# se movState == left, pula pra "dontTeleportRightKro"
+	li a1, 0			# usa o teleporte da direita
+	dontTeleportRightKro:
+	j kroHasMoved
+	
+moveKroUp:
+	li t1, 2
+	bne t0, t1, moveKroDown		# t0 == 2
+	
+	addi a2, a2, -4			# update temporario do eixo Y para cima
+	call checkCollision		# check de colisao superior equerda
+	addi a2, a2, 4			# cancela o update temporario do eixo Y
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveKro		# se ha colisao, pula para "moveKro"
+	
+	addi a2, a2, -4			# update temporario do eixo Y para cima
+	addi a1, a1, 12			# update temporario do eixo X para direita
+	call checkCollision		# check de colisao superior direito
+	addi a2, a2, 4			# cancela update temporario do eixo Y para cima
+	addi a1, a1, -12		# cancela update temporario do eixo X para direita
+	li t0, 0			# t0 = 0
+	beq t0, t1, moveKro		# se ha colisao, pula para "moveKro"
+	
+	li t0, 2
+	sw t0, 84(s1)
+	
+	addi a2, a2, -4			# update da posicao para 4 pixels para a cima
+	
+	li t1, 12
+	bge a2, t1, dontTeleportUpKro
+	li a2, 228
+	dontTeleportUpKro:
+	j kroHasMoved
+	
+moveKroDown:
+	addi a2, a2, 16			# update temporario do eixo Y para baixo
+	call checkCollision		# check de colisao inferior equerda
+	addi a2, a2, -16		# cancela o update temporario do eixo Y
+	li t0, 0			# t0 = 0
+	beq t1, t0, moveKro		# se ha colisao, pula para "moveKro"
+	
+	addi a2, a2, 16			# update temporario do eixo Y para baixo
+	addi a1, a1, 12			# update temporario do eixo X para direita
+	call checkCollision		# check de colisao superior direito
+	addi a2, a2, -16		# cancela o update temporario do eixo Y 
+	addi a1, a1, -12		# cancela o update temporario do eixo X
+	li t0, 0			# t0 = 0
+	beq t0, t1, moveKro		# se ha colisao, pula para "moveKro"
+	
+	li t0, 3
+	sw t0, 84(s1)
+	
+	addi a2, a2, 4			# update da posicao para 4 pixels para a baixo
+	
+	li t1, 228
+	bne a2, t1, kroHasMoved
+	li a2, 12 
+	
+	
+kroHasMoved:
+	mv a0, s7				# a0 = spriteKross
+	sw a1, 72(s1)				# posXkro = a1
+    	sw a2, 76(s1)				# posYKro = a2
+    	call print
+    	    	
+    	lw t1, 0(s11)
+    	lw t2, 4(s11)
+    	
+    	lw t3, 80(s1)
+    	bltz t3, endGermany
+  	
+    	blt a1, t1, kroDontTouch  	
+    	addi t1, t1, 15	
+    	bgt a1, t1, kroDontTouch
+    	blt a2, t2, kroDontTouch	
+    	addi t2, t2, 15
+    	bgt a2, t2, kroDontTouch
+    	j kroTouch
+    	kroDontTouch:
+		lw t0, 88(s1)			# t0 = frameAnimacaoKro
+		li t1, 264			# t1 = 264
+		mul t1, t1, t0			# t0 = +/- 264
+		add s7, s7, t1			# muda o sprite do Kross para ser animado
+		li t1, -1			# t1= -1
+		mul t0, t0, t1			# t0 *= -1
+		sw t0, 88(s1)			# guarda t0 em frameAnimacaoKro
+
+endGermany:
 	li a0,76			# pausa de 76m segundos
 	li a7,32
 	ecall
@@ -1526,7 +1923,7 @@ endGame:
 	ret
 restartGame:
 	mv ra, a6
-	addi ra, ra, -28
+	addi ra, ra, -32
 	ret
 	
 .include "src/print.s"
@@ -1535,10 +1932,11 @@ restartGame:
 
 .data
 fulecoInfo: .word 144, 176, 0, 0, 0, 1, 0	# posX, posY, runningState, points, superState, frameAnimacao, leftOrRight
-germanyInfo: .word 114, 128, -130, 0, 0, 0, 134, 128, -180, 0, 0, 0, 154, 128, -230, 0, 0, 0  	# 174, 128
+germanyInfo: .word 114, 128, -130, 0, 0, 0, 134, 128, -180, 0, 0, 0, 154, 128, -230, 0, 0, 0, 174, 128, -280, 0, 0, 0 
 	# posXBoa(0), posYBoa(4), timeOutBoa(8), runningStateBoa(12), frameAnimacaoBoa(16), leftorRightBoa(20)
 	# posXMul(24), posYMul(28), timeOutMul(32), runningStateMul(36), frameAnimacaoMul(40), leftOrRightMul(44)
 	# posXGot(48), posYGot(52), timeOutGot(56), runningStateGot(60), frameAnimacaoGot(64), leftOrRightGot(68)
+	# posXKro(72), posYKro(76), timeOutKro(80), runningStateGot(84), frameAnimacaoKro(88), leftOrRightKro(92)
 									
 space: .string " "
 ae: .string "moveu\n"

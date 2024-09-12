@@ -89,6 +89,7 @@ gameOneStart:
         la s4, fixedBoateng0
         la s5, fixedMuller0
         la s6, fixedGotze0
+        la s7, fixedKross0
 	la s8, map1Collision
 	la s9, map1
 	la s10, fulecoLeft0
@@ -100,6 +101,7 @@ gameTwoStart:
     	la s4, fixedBoateng0
     	la s5, fixedMuller0
     	la s6, fixedGotze0
+    	la s7, fixedKross0
 	la s8, map2Collision
 	la s9, map2
 	la s10, fulecoLeft0
@@ -166,6 +168,16 @@ NOTAS: 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 5
 .include "sprites/alemanha/arquivos .data/GotzeLeft1Inv.data" 		# inclui o .data com o Gotze Left 1 Inv
 .include "sprites/alemanha/arquivos .data/GotzeRight0Inv.data"		# inclui o .data com o Gotze Right 0 Inv
 .include "sprites/alemanha/arquivos .data/GotzeRight1Inv.data"		# inclui o .data com o Gotze Right 1 Inv
+    # Sprites do Kross
+.include "sprites/alemanha/arquivos .data/KrossLeft0.data"		# inclui o .data com o Kross Left 0
+.include "sprites/alemanha/arquivos .data/KrossLeft1.data" 		# inclui o .data com o Kross Left 1
+.include "sprites/alemanha/arquivos .data/KrossRight0.data"		# inclui o .data com o Kross Right 0
+.include "sprites/alemanha/arquivos .data/KrossRight1.data"		# inclui o .data com o Kross Right 1
+
+.include "sprites/alemanha/arquivos .data/KrossLeft0Inv.data"		# inclui o .data com o Kross Left 0 Inv
+.include "sprites/alemanha/arquivos .data/KrossLeft1Inv.data" 		# inclui o .data com o Kross Left 1 Inv
+.include "sprites/alemanha/arquivos .data/KrossRight0Inv.data"		# inclui o .data com o Kross Right 0 Inv
+.include "sprites/alemanha/arquivos .data/KrossRight1Inv.data"		# inclui o .data com o Kross Right 1 Inv
 
 
 
