@@ -141,6 +141,7 @@ end:
 
 .include "main.s"
 
+
 .data
 # Numero de Notas a tocar
 NUM: .word 160
@@ -206,6 +207,19 @@ NOTAS: 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 5
 .include "sprites/alemanha/arquivos .data/KrossLeft1Inv.data" 		# inclui o .data com o Kross Left 1 Inv
 .include "sprites/alemanha/arquivos .data/KrossRight0Inv.data"		# inclui o .data com o Kross Right 0 Inv
 .include "sprites/alemanha/arquivos .data/KrossRight1Inv.data"		# inclui o .data com o Kross Right 1 Inv
+    # HUD
+.include "sprites/numbers/arquivos .data/zero.data"
+.include "sprites/numbers/arquivos .data/one.data"
+.include "sprites/numbers/arquivos .data/two.data"
+.include "sprites/numbers/arquivos .data/three.data"
+.include "sprites/numbers/arquivos .data/four.data"
+.include "sprites/numbers/arquivos .data/five.data"
+.include "sprites/numbers/arquivos .data/six.data"
+.include "sprites/numbers/arquivos .data/seven.data"
+.include "sprites/numbers/arquivos .data/eight.data"
+.include "sprites/numbers/arquivos .data/nine.data"
+.include "sprites/numbers/arquivos .data/score.data"
+.include "sprites/numbers/arquivos .data/heart.data"
 
 
 
