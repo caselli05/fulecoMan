@@ -96,6 +96,18 @@ loopgame:
     	li a1, 0
     	li a2, 0
     	call printProps 
+    #print hearts
+printHeart:
+    	mv a5, s0    
+    	la a0, heart
+    	li a1, 264
+    	li a2, 0
+    	loopPrintHeart:
+    		call print
+    		addi a5, a5, -1
+    		beqz a5, input
+    		addi a1, a1, 16
+    		j loopPrintHeart
 
 input:
     # get input
@@ -387,6 +399,60 @@ dontBeSuper:
 	sub s7, s7, t0
 		
 isNotSuper:
+	la a0,score  			# salva o endere�o da string
+	li a1, 0
+	li a2, 0
+	call print
+	
+	li a1, 96
+	lw a4, 12(s11)			# to = points
+    # x--
+	li a5, 100
+	la a0, Zero
+	divu t2, a4, a5			# t2 = a4/a5
+	li t0, 10
+	rem t2, t2, t0			# t2 = t2%10
+		loopMul1:
+		beqz t2, outLoopMul1
+		addi a0, a0, 264
+		addi t2, t2, -1
+		j loopMul1
+	outLoopMul1:
+	add a0, a0, t2			# a0 = Zero+t2
+	call print
+	addi a1, a1, 16
+    # -x-
+    	li a5, 10
+	la a0, Zero
+	divu t2, a4, a5			# t2 = a4/a5
+	li t0, 10
+	rem t2, t2, t0			# t2 = t2%10
+		loopMul2:
+		beqz t2, outLoopMul2
+		addi a0, a0, 264
+		addi t2, t2, -1
+		j loopMul2
+	outLoopMul2:
+	add a0, a0, t2			# a0 = Zero+t2
+	call print
+	addi a1, a1, 16
+    # --x
+    	li a5, 1
+	la a0, Zero
+	divu t2, a4, a5			# t2 = a4/a5
+	li t0, 10
+	rem t2, t2, t0			# t2 = t2%10
+		loopMul3:
+		beqz t2, outLoopMul3
+		addi a0, a0, 264
+		addi t2, t2, -1
+		j loopMul3
+	outLoopMul3:
+	add a0, a0, t2			# a0 = Zero+t2
+	call print
+	addi a1, a1, 16
+
+boateng: 
     # Boateng
     	lw a1, 0(s1)
     	lw a2, 4(s1)
@@ -1922,7 +1988,6 @@ restartGame:
 	addi ra, ra, -32
 	ret
 	
-
 .include "src/checkCollision.s"
 .include "src/printProps.s"
 .include "src/print.s"

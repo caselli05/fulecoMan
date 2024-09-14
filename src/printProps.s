@@ -40,4 +40,4 @@ jBrazuca:
 	addi a2, a2, 16			# a2 += 1
 	blt a2, t1, loopPrintProps	# se a2 > 240, pula para "loopPrintProps"
 	
-	j input		# retorna
+	j printHeart		# retorna
