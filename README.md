@@ -1,10 +1,5 @@
-Here’s the README translated into English:
+# Fuleco-Man  -  RISC-V
 
----
-
-# Fuleco vs Germany - A RISC-V Pacman Remake
-
-![Fuleco Pacman Remake](path/to/image.png)
 
 ## Description
 This is a remake of the classic **Pacman** game, developed in Assembly for the **RISC-V** architecture. Instead of Pacman, you play as Fuleco, the mascot of the 2014 World Cup, and the ghosts are players from the German national team that defeated Brazil in the infamous semi-final. The goal is to help Fuleco escape the players and restore his honor!
