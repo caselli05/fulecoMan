@@ -173,40 +173,40 @@ NOTAS: 64, 200, 52, 200, 64, 200, 64, 200, 62, 200, 52, 200, 60, 200, 52, 200, 5
 .include "sprites/alemanha/arquivos .data/BoatengRight0.data"		# inclui o .data com o Boateng Right 0
 .include "sprites/alemanha/arquivos .data/BoatengRight1.data"		# inclui o .data com o Boateng Right 1
 
-.include "sprites/alemanha/arquivos .data/BoatengLeft0Inv.data"		# inclui o .data com o Boateng Left 0 Inv
-.include "sprites/alemanha/arquivos .data/BoatengLeft1Inv.data"		# inclui o .data com o Boateng Left 1 Inv
-.include "sprites/alemanha/arquivos .data/BoatengRight0Inv.data"	# inclui o .data com o Boateng Right 0 Inv
-.include "sprites/alemanha/arquivos .data/BoatengRight1Inv.data"	# inclui o .data com o Boateng Right 1 Inv
+.include "sprites/alemanha/argentina/arquivos .data/MascheranoLeft0.data"		# inclui o .data com o Boateng Left 0 Inv
+.include "sprites/alemanha/argentina/arquivos .data/MascheranoLeft1.data"		# inclui o .data com o Boateng Left 1 Inv
+.include "sprites/alemanha/argentina/arquivos .data/MascheranoRight0.data"	# inclui o .data com o Boateng Right 0 Inv
+.include "sprites/alemanha/argentina/arquivos .data/MascheranoRight1.data"	# inclui o .data com o Boateng Right 1 Inv
     # Sprites do Muller
 .include "sprites/alemanha/arquivos .data/MullerLeft0.data"		# inclui o .data com o Boateng Left 0
 .include "sprites/alemanha/arquivos .data/MullerLeft1.data" 		# inclui o .data com o Boateng Left 1
 .include "sprites/alemanha/arquivos .data/MullerRight0.data"		# inclui o .data com o Boateng Right 0
 .include "sprites/alemanha/arquivos .data/MullerRight1.data"		# inclui o .data com o Boateng Right 1
 
-.include "sprites/alemanha/arquivos .data/MullerLeft0Inv.data"		# inclui o .data com o Boateng Left 0 Inv
-.include "sprites/alemanha/arquivos .data/MullerLeft1Inv.data" 		# inclui o .data com o Boateng Left 1 Inv
-.include "sprites/alemanha/arquivos .data/MullerRight0Inv.data"		# inclui o .data com o Boateng Right 0 Inv
-.include "sprites/alemanha/arquivos .data/MullerRight1Inv.data"		# inclui o .data com o Boateng Right 1 Inv
+.include "sprites/alemanha/argentina/arquivos .data/MessiLeft0.data"		# inclui o .data com o Boateng Left 0 Inv
+.include "sprites/alemanha/argentina/arquivos .data/MessiLeft1.data" 		# inclui o .data com o Boateng Left 1 Inv
+.include "sprites/alemanha/argentina/arquivos .data/MessiRight0.data"		# inclui o .data com o Boateng Right 0 Inv
+.include "sprites/alemanha/argentina/arquivos .data/MessiRight1.data"		# inclui o .data com o Boateng Right 1 Inv
     # Sprites do Gotze
 .include "sprites/alemanha/arquivos .data/GotzeLeft0.data"		# inclui o .data com o Gotze Left 0
 .include "sprites/alemanha/arquivos .data/GotzeLeft1.data" 		# inclui o .data com o Gotze Left 1
 .include "sprites/alemanha/arquivos .data/GotzeRight0.data"		# inclui o .data com o Gotze Right 0
 .include "sprites/alemanha/arquivos .data/GotzeRight1.data"		# inclui o .data com o Gotze Right 1
 
-.include "sprites/alemanha/arquivos .data/GotzeLeft0Inv.data"		# inclui o .data com o Gotze Left 0 Inv
-.include "sprites/alemanha/arquivos .data/GotzeLeft1Inv.data" 		# inclui o .data com o Gotze Left 1 Inv
-.include "sprites/alemanha/arquivos .data/GotzeRight0Inv.data"		# inclui o .data com o Gotze Right 0 Inv
-.include "sprites/alemanha/arquivos .data/GotzeRight1Inv.data"		# inclui o .data com o Gotze Right 1 Inv
+.include "sprites/alemanha/argentina/arquivos .data/BigliaLeft0.data"		# inclui o .data com o Gotze Left 0 Inv
+.include "sprites/alemanha/argentina/arquivos .data/BigliaLeft1.data" 		# inclui o .data com o Gotze Left 1 Inv
+.include "sprites/alemanha/argentina/arquivos .data/BigliaRight0.data"		# inclui o .data com o Gotze Right 0 Inv
+.include "sprites/alemanha/argentina/arquivos .data/BigliaRight1.data"		# inclui o .data com o Gotze Right 1 Inv
     # Sprites do Kross
 .include "sprites/alemanha/arquivos .data/KrossLeft0.data"		# inclui o .data com o Kross Left 0
 .include "sprites/alemanha/arquivos .data/KrossLeft1.data" 		# inclui o .data com o Kross Left 1
 .include "sprites/alemanha/arquivos .data/KrossRight0.data"		# inclui o .data com o Kross Right 0
 .include "sprites/alemanha/arquivos .data/KrossRight1.data"		# inclui o .data com o Kross Right 1
 
-.include "sprites/alemanha/arquivos .data/KrossLeft0Inv.data"		# inclui o .data com o Kross Left 0 Inv
-.include "sprites/alemanha/arquivos .data/KrossLeft1Inv.data" 		# inclui o .data com o Kross Left 1 Inv
-.include "sprites/alemanha/arquivos .data/KrossRight0Inv.data"		# inclui o .data com o Kross Right 0 Inv
-.include "sprites/alemanha/arquivos .data/KrossRight1Inv.data"		# inclui o .data com o Kross Right 1 Inv
+.include "sprites/alemanha/argentina/arquivos .data/DiMariaLeft0.data"		# inclui o .data com o Kross Left 0 Inv
+.include "sprites/alemanha/argentina/arquivos .data/DiMariaLeft1.data" 		# inclui o .data com o Kross Left 1 Inv
+.include "sprites/alemanha/argentina/arquivos .data/DiMariaRight0.data"		# inclui o .data com o Kross Right 0 Inv
+.include "sprites/alemanha/argentina/arquivos .data/DiMariaRight1.data"		# inclui o .data com o Kross Right 1 Inv
     # HUD
 .include "sprites/numbers/arquivos .data/zero.data"
 .include "sprites/numbers/arquivos .data/one.data"
