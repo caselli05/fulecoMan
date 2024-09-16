@@ -30,7 +30,7 @@ To run the game, you will need:
 Contributions are welcome! Feel free to open issues and submit pull requests.
 
 ## License
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](https://opensource.org/license/mit).
 
 ## Authors
 - **Felipe Caselli** - [@caselli05](https://github.com/caselli05)
