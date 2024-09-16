@@ -17,9 +17,9 @@ This is a remake of the classic **Pacman** game, developed in Assembly for the *
 
 ## Requirements
 To run the game, you will need:
-- A **RISC-V simulator or emulator**: such as FPGARS (included in this repository)
-- A **RISC-V development environment**: such as Rars16_Custom1.jar
-- A **Virtual Machine**: such as Java
+- A **RISC-V simulator or emulator**: such as [FPGARS](https://github.com/LeoRiether/FPGRARS) (included in this repository)
+- A **RISC-V development environment**: such as Rars16_Custom1.jar (included in this repository)
+- A **Virtual Machine**: such as [Java](https://www.java.com/pt-BR/download/ie_manual.jsp?locale)
 
 ## Controls
 - **WASD keys**: move Fuleco
