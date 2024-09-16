@@ -5,44 +5,26 @@
 This is a remake of the classic **Pacman** game, developed in Assembly for the **RISC-V** architecture. Instead of Pacman, you play as Fuleco, the mascot of the 2014 World Cup, and the ghosts are players from the German national team that defeated Brazil in the infamous semi-final. The goal is to help Fuleco escape the players and restore his honor!
 
 ## Features
-- **Main character:** Fuleco (2014 World Cup mascot).
-- **Enemies:** Players from the German national football team.
-- **Classic Pacman movement** with keyboard controls.
-- **Score system** inspired by the original game.
+- **Graphical interface**: Bitmap Display, 320x240px, 8bits/pixel
+- **Keyboard interface**: Keyboard and Display MMIO simulator
+- **MIDI audio interface**: ecalls 31, 32, 33
+- **Collisions**: with walls and enemies
+- **Four enemies**: with different behaviors
+- **Two levels**: with different layouts
+- **Character annimation and movement**
+
 - **Developed in Assembly for RISC-V architecture**.
 
 ## Requirements
 To run the game, you will need:
-- A **RISC-V simulator or emulator** (such as Spike or QEMU)
-- **RISC-V GCC compiler** or another compatible assembler
-
-## How to run the project
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/fuleco-vs-germany.git
-   ```
-
-2. Compile the code:
-   ```bash
-   riscv64-unknown-elf-gcc -o fuleco_vs_germany main.s
-   ```
-
-3. Run the game on a RISC-V emulator (like Spike or QEMU):
-   ```bash
-   spike pk fuleco_vs_germany
-   ```
+- A **RISC-V simulator or emulator**: such as FPGARS (included in this repository)
+- A **RISC-V development environment**: such as Rars16_Custom1.jar
+- A **Virtual Machine**: such as Java
 
 ## Controls
-- **Arrow keys**: move Fuleco
-- **P**: pause the game
-- **Q**: quit the game
-
-## Code Structure
-- `main.s`: Main file containing the game logic
-- `graphics.s`: Functions for rendering the map and characters
-- `input.s`: Player input handling
-- `sound.s`: Simple sound implementation (optional)
+- **WASD keys**: move Fuleco
+- **1**: starts game in phase one
+- **2**: cheat code to phase two
 
 ## Contributions
 Contributions are welcome! Feel free to open issues and submit pull requests.
@@ -50,6 +32,11 @@ Contributions are welcome! Feel free to open issues and submit pull requests.
 ## License
 This project is licensed under the [MIT License](LICENSE).
 
----
+## Authors
+- **Felipe Caselli** - [@caselli05](https://github.com/caselli05)
+- **Gabriel Rodrigues**
+- **Davi Bragança** - [@FluminenseFD](https://github.com/FluminenseFD)
 
-Feel free to add screenshots or gameplay videos to make it more engaging!
+##
+
+Have fun saving Brazil!
