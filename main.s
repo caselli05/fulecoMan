@@ -367,9 +367,27 @@ dontChangeFrameAnimacao:
 	sw t0, 12(s11)			# guarda os pontos
 	li t1, 115			# t1 = 115
 	beq t0, t1, endGame		# se pontos == 115, acaba a run
+	
+	li a0, 90			# valor da nota
+	li a1, 76			# duracao da nota
+	li a2, 56			# instrumento
+	li a3, 80			# volume
+	li a7, 31			
+	ecall
+	li a3, 0
+	
 dontAddPoints:
 	li t1, 192			# t1 = 192
 	bne t1, t2, dontBeSuper		# se t1 != t2, pula pra dontBeSuper
+	
+	li a0, 80			# valor da nota
+	li a1, 500			# duracao da nota
+	li a2, 90			# instrumento
+	li a3, 80			# volume
+	li a7, 31			
+	ecall
+	li a3, 0
+	
 	li t1, 17			# t1 = 17
 	sb t1, 8(t0)			# guarda 17 no endereco da brazuca recem pegada
 	# trocar o estado de superfuleco
@@ -648,6 +666,15 @@ boaTouch:
 	lw t0, 16(s11)
 	
 	beqz t0, boaKillFuleco
+	
+		li a0, 80			# valor da nota
+		li a1, 75			# duracao da nota
+		li a2, 5			# instrumento
+		li a3, 125			# volume
+		li a7, 31			
+		ecall
+		li a3, 0
+	
 		li a1, 114			# posBoaX = 114
 		li a2, 128			# posYBoa = 128
 		li t1, -131
@@ -1023,6 +1050,17 @@ mulTouch:
 	lw t0, 16(s11)
 	
 	beqz t0, mulKillFuleco
+	
+		
+		li a0, 80			# valor da nota
+		li a1, 75			# duracao da nota
+		li a2, 5			# instrumento
+		li a3, 125			# volume
+		li a7, 31			
+		ecall
+		li a3, 0
+	
+	
 		li a1, 134			# posXMul = 134
 		li a2, 128			# posYMul = 128
 		li t1, -131
@@ -1407,6 +1445,15 @@ gotTouch:
 	lw t0, 16(s11)
 	
 	beqz t0, gotKillFuleco
+	
+		li a0, 80			# valor da nota
+		li a1, 75			# duracao da nota
+		li a2, 5			# instrumento
+		li a3, 125			# volume
+		li a7, 31			
+		ecall
+		li a3, 0
+	
 		li a1, 154			# posXGot = 154
 		li a2, 128			# posYGot = 128
 		li t1, -131
@@ -1790,6 +1837,17 @@ kroTouch:
 	lw t0, 16(s11)
 	
 	beqz t0, kroKillFuleco
+	
+		
+		li a0, 80			# valor da nota
+		li a1, 75			# duracao da nota
+		li a2, 5			# instrumento
+		li a3, 125			# volume
+		li a7, 31			
+		ecall
+		li a3, 0
+	
+	
 		li a1, 174			# posXKro = 174
 		li a2, 128			# posYKro = 128
 		li t1, -131
