@@ -2,7 +2,7 @@
 
 
 ## Description
-This is a remake of the classic **Pacman** game, developed in Assembly for the **RISC-V** architecture. Instead of Pacman, you play as Fuleco, the mascot of the 2014 World Cup, and the ghosts are players from the German national team that defeated Brazil in the infamous semi-final. The goal is to help Fuleco escape the players and restore his honor!
+This is a remake of the classic **Pacman** game, developed in Assembly for the **RISC-V** architecture. Instead of Pacman, you play as Fuleco, the mascot of the 2014 World Cup, and the ghosts are players from the German national team that defeated Brazil in the [infamous semi-final](https://www.youtube.com/watch?v=xvFZjo5PgG0). The goal is to help Fuleco escape the players and restore his honor!
 
 ## Features
 - **Graphical interface**: Bitmap Display, 320x240px, 8bits/pixel
