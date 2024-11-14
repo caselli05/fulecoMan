@@ -35,7 +35,7 @@ This project is licensed under the [MIT License](https://opensource.org/license/
 ## Authors
 - **Felipe Caselli** - [@caselli05](https://github.com/caselli05)
 - **Gabriel Rodrigues**
-- **Davi Bragança** - [@FluminenseFD](https://github.com/FluminenseFD)
+- **Davi Bragança** - [@davibraganca10](https://github.com/davibraganca10)
 
 ##
 
